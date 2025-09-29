@@ -203,3 +203,96 @@ After committing this plan:
 2. Move files to appropriate locations
 3. Update references incrementally
 4. Test after each phase
+
+---
+
+## Phase 1 Implementation Notes
+
+### Design Decisions (2025-09-29)
+
+**Shell Support:**
+- **zsh only** - Drop bash support to simplify
+- Update `init` command to only configure zsh
+- Remove bash-specific logic from shell detection
+
+**Command Naming:**
+- Rename `shellenv` → `env` for brevity
+- `dev env` is clearer and shorter than `dev shellenv`
+- Group configuration symlink commands under `config` subcommand
+
+### Updated Command Structure
+
+**Core Commands:**
+- `dev env` - Export configuration for dev environment (renamed from shellenv)
+- `dev init` - Initialize dev for zsh only
+- `dev update` - Update dev from git and re-link
+- `dev edit` - Edit dev repository in $EDITOR
+
+**Config Management (new subcommand):**
+- `dev config status` - Show configuration status (symlinks)
+- `dev config link` - Link configuration files
+- `dev config unlink` - Unlink configuration files
+
+**Provisioning Commands:**
+- `dev host [platform]` - Run platform provisioning script
+- `dev tool [tool_name] [action]` - Manage tool installation
+
+**Rationale:**
+- Groups related symlink operations under `config`
+- Keeps top-level commands focused on high-level operations
+- `status`, `link`, `unlink` are all about config file management
+
+**Global Options:**
+- `-d <directory>` - Specify dev directory (default: `$DEV_HOME`)
+- `-t <directory>` - Specify target directory (default: `$HOME`)
+- `-v` - Verbose output
+- `-h` - Show help
+
+**Environment Variables:**
+- `DEV_HOME` - Location of dev repository (default: `$XDG_DATA_HOME/dev`)
+- `DEV_CONFIG` - User config override (default: `$XDG_CONFIG_HOME/dev`)
+- `DEV_BIN` - Dev bin directory (computed: `$DEV_HOME/bin`)
+- `DEV_HOSTS` - Hosts directory (computed: `$DEV_HOME/hosts`)
+- `DEV_TOOLS` - Tools directory (computed: `$DEV_HOME/tools`)
+- `XDG_CONFIG_HOME` - Default: `$HOME/.config`
+- `XDG_DATA_HOME` - Default: `$HOME/.local/share`
+- `XDG_STATE_HOME` - Default: `$HOME/.local/state`
+- `XDG_CACHE_HOME` - Default: `$HOME/.cache`
+- `XDG_BIN_HOME` - Default: `$HOME/.local/bin`
+- `TARGET` - Target for symlinks (default: `$HOME`)
+
+### Phase 1.1 Completion Status
+
+**Completed (2025-09-29):**
+
+✅ Created `.editorconfig` (ported from dotfiles)
+- 2-space indentation for most files
+- Tab indentation for git/ssh config files
+- UTF-8, LF line endings
+- Trim trailing whitespace
+
+✅ Created `bin/dev` scaffold with:
+- All environment variable setup (XDG + DEV_*)
+- Command line option parsing (-d, -t, -v, -h)
+- Logging functions (log, vlog, err)
+- Command structure with stubs for all commands
+- Config subcommand with status/link/unlink actions
+- Proper error handling for invalid commands/actions
+- No modelines (using .editorconfig instead)
+
+✅ Updated documentation:
+- NOTES.md with Phase 1 implementation notes
+- ASSISTANT.md with updated command structure and zsh-only note
+- Both files reflect config subcommand design
+
+**Testing Results:**
+- All commands route correctly
+- Config subcommand works with all actions (status, link, unlink)
+- Error handling works (missing action, invalid action)
+- Verbose flag works
+- Option overrides work (-d, -t)
+- Help output is clear and accurate
+
+**Next Steps:**
+- Phase 1.2: Create directory structure (bin/, config/, hosts/, tools/, docs/)
+- Implement actual functionality for each command stub

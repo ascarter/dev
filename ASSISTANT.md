@@ -26,6 +26,7 @@ The system is built around a central `bin/dev` tool that will manage the develop
 - Modular and extensible - tools can be installed independently
 - Avoids system pollution by using portable installations
 - Cross-platform support for macOS (primary), Linux (usually Fedora), and Windows (WSL or native)
+- **zsh only** - Shell integration and init focused on zsh
 
 ## Directory Structure
 
@@ -47,9 +48,40 @@ The installation process is designed to be as simple as possible. The `install.s
 
 Tools are designed to be run independently and can be executed multiple times without causing issues. This allows for easy updates and modifications to the setup. Tools are not generally automatically installed - the user can install tools as needed and there will be conveniences for installing sets of tools (including all the tools).
 
+## Commands
+
+```bash
+# Export environment configuration
+dev env
+
+# Initialize shell integration (zsh only)
+dev init
+
+# Update dev from git and re-link
+dev update
+
+# Edit dev repository in $EDITOR
+dev edit
+
+# Configuration file management
+dev config status      # Show status of all configuration files
+dev config link        # Link all configuration files
+dev config unlink      # Unlink all configuration files
+
+# Run host provisioning
+dev host [platform]
+
+# Manage tools
+dev tool [name] [action]
+```
+
 ## Key Environment Variables
 
 - `DEV_HOME` - Location of dev repository (default: `$XDG_DATA_HOME/dev`)
+- `DEV_CONFIG` - User config override directory (default: `$XDG_CONFIG_HOME/dev`)
+- `DEV_BIN` - Dev bin directory (computed: `$DEV_HOME/bin`)
+- `DEV_HOSTS` - Hosts directory (computed: `$DEV_HOME/hosts`)
+- `DEV_TOOLS` - Tools directory (computed: `$DEV_HOME/tools`)
 - `TARGET` - Target directory for symlinks (default: `$HOME`)
 
 ## Configuration Override
@@ -72,6 +104,7 @@ User-specific configurations can be placed in `$XDG_CONFIG_HOME/dev/` to overrid
 - Honor .editorconfig guidelines
 - Use XDG environment variables
 - NEVER hardcode anything that could be a secret or identifiable (like names or logins)
+- Use .editorconfig settings instead of modelines in the files
 
 ## Hosts and Tools System
 

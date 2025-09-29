@@ -1,0 +1,217 @@
+#!/bin/sh
+
+# Development environment management tool
+
+# set -x
+
+# XDG Base Directory Specification
+XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
+XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
+XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
+XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}
+
+# Dev environment variables
+DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
+DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
+DEV_BIN=${DEV_HOME}/bin
+DEV_HOSTS=${DEV_HOME}/hosts
+DEV_TOOLS=${DEV_HOME}/tools
+
+# Target directory for symlinks
+TARGET=${TARGET:-$HOME}
+
+# Verbose output flag
+VERBOSE=0
+
+# Files and patterns to exclude from linking
+EXCLUDE_PATTERNS=".DS_Store Thumbs.db *.tmp .gitkeep"
+
+# ------------------------------
+# Logging functions
+# ------------------------------
+
+log() {
+  if [ "$#" -eq 1 ]; then
+    printf "%s\n" "$1"
+  elif [ "$#" -gt 1 ]; then
+    printf "$(tput bold)%-10s$(tput sgr0)\t%s\n" "$1" "$2"
+  fi
+}
+
+# Verbose log
+vlog() {
+  if [ $VERBOSE -eq 1 ]; then
+    log "$@"
+  fi
+}
+
+err() {
+  echo "$*" >&2
+}
+
+# ------------------------------
+# Usage and help
+# ------------------------------
+
+usage() {
+  log "dev" "Development environment management tool"
+  log ""
+  log "Usage:" "dev [options] <command>"
+  log ""
+  log "Commands:" ""
+  log "  env" "Export configuration for dev environment"
+  log "  init" "Initialize dev for zsh"
+  log "  update" "Update dev from git and re-link"
+  log "  edit" "Edit dev repository in \$EDITOR"
+  log "  config <action>" "Manage configuration files (status|link|unlink)"
+  log "  host [platform]" "Run host provisioning script"
+  log "  tool [name] [action]" "Manage tool installation"
+  log ""
+  log "Options:" ""
+  log "  -d <dir>" "Dev directory (default: \$DEV_HOME)"
+  log "  -t <dir>" "Target directory (default: \$HOME)"
+  log "  -v" "Verbose output"
+  log "  -h" "Show help"
+}
+
+# ------------------------------
+# Command functions (stubs)
+# ------------------------------
+
+cmd_env() {
+  log "env" "Export environment configuration"
+  vlog "DEV_HOME" "$DEV_HOME"
+  vlog "DEV_CONFIG" "$DEV_CONFIG"
+  vlog "TARGET" "$TARGET"
+  # TODO: Implement shellenv export
+}
+
+cmd_init() {
+  log "init" "Initialize dev for zsh"
+  # TODO: Implement zsh initialization
+}
+
+cmd_config() {
+  action="$1"
+  case "$action" in
+  status)
+    log "config" "Show configuration status"
+    # TODO: Implement status checking
+    ;;
+  link)
+    log "config" "Link configuration files"
+    # TODO: Implement linking
+    ;;
+  unlink)
+    log "config" "Unlink configuration files"
+    # TODO: Implement unlinking
+    ;;
+  "")
+    err "config: action required (status|link|unlink)"
+    exit 1
+    ;;
+  *)
+    err "config: unknown action '$action'"
+    exit 1
+    ;;
+  esac
+}
+
+cmd_update() {
+  log "update" "Update dev from git and re-link"
+  # TODO: Implement update
+}
+
+cmd_edit() {
+  log "edit" "Edit dev repository in \$EDITOR"
+  vlog "EDITOR" "${EDITOR:-not set}"
+  vlog "DEV_HOME" "$DEV_HOME"
+  # TODO: Implement editor opening
+}
+
+cmd_host() {
+  platform="$1"
+  if [ -z "$platform" ]; then
+    log "host" "Available platforms:"
+    # TODO: List available host scripts
+  else
+    log "host" "Run provisioning for $platform"
+    # TODO: Execute host script
+  fi
+}
+
+cmd_tool() {
+  tool_name="$1"
+  action="$2"
+  if [ -z "$tool_name" ]; then
+    log "tool" "Available tools:"
+    # TODO: List available tools
+  elif [ -z "$action" ]; then
+    log "tool" "Actions: install, uninstall, status, update"
+  else
+    log "tool" "$action $tool_name"
+    # TODO: Execute tool action
+  fi
+}
+
+# ------------------------------
+# Main
+# ------------------------------
+
+# Parse command line options
+while getopts ":d:t:vh" opt; do
+  case $opt in
+  d) DEV_HOME=$OPTARG ;;
+  t) TARGET=$OPTARG ;;
+  v) VERBOSE=1 ;;
+  h) usage && exit 0 ;;
+  \?) usage && exit 1 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+# Update computed paths if DEV_HOME was overridden
+DEV_BIN=${DEV_HOME}/bin
+DEV_HOSTS=${DEV_HOME}/hosts
+DEV_TOOLS=${DEV_HOME}/tools
+
+vlog "DEV_HOME" "$DEV_HOME"
+vlog "DEV_CONFIG" "$DEV_CONFIG"
+vlog "DEV_BIN" "$DEV_BIN"
+vlog "DEV_HOSTS" "$DEV_HOSTS"
+vlog "DEV_TOOLS" "$DEV_TOOLS"
+vlog "TARGET" "$TARGET"
+
+# Get command
+command="${1:-}"
+shift 2>/dev/null || true
+
+# Execute command
+case "$command" in
+env)
+  cmd_env "$@"
+  ;;
+init)
+  cmd_init "$@"
+  ;;
+config)
+  cmd_config "$@"
+  ;;
+update)
+  cmd_update "$@"
+  ;;
+edit)
+  cmd_edit "$@"
+  ;;
+host)
+  cmd_host "$@"
+  ;;
+tool)
+  cmd_tool "$@"
+  ;;
+*)
+  usage
+  exit 1
+  ;;
+esac
