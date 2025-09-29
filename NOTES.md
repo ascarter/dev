@@ -296,3 +296,30 @@ After committing this plan:
 **Next Steps:**
 - Phase 1.2: Create directory structure (bin/, config/, hosts/, tools/, docs/)
 - Implement actual functionality for each command stub
+
+---
+
+## Command Implementation
+
+### `dev env` - COMPLETED (2025-09-29)
+
+Exports shell environment configuration for sourcing in shell profiles.
+
+**Implementation:**
+- Exports all XDG Base Directory variables with defaults
+- Exports DEV_HOME and DEV_CONFIG with XDG-compliant defaults
+- Adds XDG_BIN_HOME and DEV_HOME/bin to PATH
+- Profile sourcing removed (will be addressed in zsh profile configuration later)
+
+**Usage:**
+```zsh
+# In ~/.zshrc
+eval "$(dev env)"
+```
+
+**Testing:**
+- ✅ Generates correct export statements
+- ✅ Works with eval in zsh
+- ✅ Works when sourced in sh
+- ✅ Sets all environment variables correctly
+- ✅ Adds bin directories to PATH

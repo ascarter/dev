@@ -14,9 +14,6 @@ XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}
 # Dev environment variables
 DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
 DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
-DEV_BIN=${DEV_HOME}/bin
-DEV_HOSTS=${DEV_HOME}/hosts
-DEV_TOOLS=${DEV_HOME}/tools
 
 # Target directory for symlinks
 TARGET=${TARGET:-$HOME}
@@ -80,11 +77,14 @@ usage() {
 # ------------------------------
 
 cmd_env() {
-  log "env" "Export environment configuration"
-  vlog "DEV_HOME" "$DEV_HOME"
-  vlog "DEV_CONFIG" "$DEV_CONFIG"
-  vlog "TARGET" "$TARGET"
-  # TODO: Implement shellenv export
+  printf 'export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}\n'
+  printf 'export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}\n'
+  printf 'export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}\n'
+  printf 'export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}\n'
+  printf 'export XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}\n'
+  printf 'export DEV_HOME=${DEV_HOME:-$XDG_DATA_HOME/dev}\n'
+  printf 'export DEV_CONFIG=${DEV_CONFIG:-$XDG_CONFIG_HOME/dev}\n'
+  printf 'export PATH=${XDG_BIN_HOME}:${DEV_HOME}/bin:$PATH\n'
 }
 
 cmd_init() {
@@ -170,18 +170,6 @@ while getopts ":d:t:vh" opt; do
   esac
 done
 shift $((OPTIND - 1))
-
-# Update computed paths if DEV_HOME was overridden
-DEV_BIN=${DEV_HOME}/bin
-DEV_HOSTS=${DEV_HOME}/hosts
-DEV_TOOLS=${DEV_HOME}/tools
-
-vlog "DEV_HOME" "$DEV_HOME"
-vlog "DEV_CONFIG" "$DEV_CONFIG"
-vlog "DEV_BIN" "$DEV_BIN"
-vlog "DEV_HOSTS" "$DEV_HOSTS"
-vlog "DEV_TOOLS" "$DEV_TOOLS"
-vlog "TARGET" "$TARGET"
 
 # Get command
 command="${1:-}"
