@@ -1,0 +1,66 @@
+# Common command line tools
+brew "btop"
+brew "cmark-gfm"
+brew "fastfetch"
+brew "htop"
+brew "jq"
+brew "serie"
+brew "uutils-coreutils"
+brew "uutils-diffutils"
+brew "uutils-findutils"
+brew "ykman"
+brew "yq"
+
+# Editors
+brew "helix"
+
+# Developer tools
+brew "gh"
+brew "marksman"
+brew "shfmt"
+brew "sqlite"
+brew "taplo"
+
+if OS.mac?
+  brew "gnupg"
+  brew "pinentry"
+  brew "pinentry-mac"
+  brew "yubico-piv-tool"
+
+  cask_args adopt: true
+  cask "bbedit"
+  cask "chatgpt"
+  cask "claude"
+  cask "docker"
+  cask "ghostty"
+  cask "github"
+  cask "hhkb"
+  cask "karabiner-elements"
+  cask "netnewswire"
+  cask "proton-drive"
+  cask "proton-mail"
+  cask "proton-mail-bridge"
+  cask "proton-pass"
+  cask "protonvpn"
+  cask "signal"
+  cask "tailscale"
+  cask "vivaldi"
+  cask "xquartz"
+  cask "xscope"
+  cask "yubico-authenticator"
+
+  # My extras
+  tap "ascarter/extras"
+  brew "ascarter/extras/sk-libfido2"
+
+  # 3rd party utilities
+  tap "teamookla/speedtest"
+  brew "teamookla/speedtest/speedtest"
+
+  tap "dagger/tap"
+  cask "container-use"
+elsif OS.linux?
+  # ...
+end
+
+# vim: set ft=rb ts=2 sw=2 et:

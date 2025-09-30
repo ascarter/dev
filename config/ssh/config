@@ -1,0 +1,8 @@
+Include ~/.ssh/identities
+
+Host *
+	IdentityAgent none
+	IdentitiesOnly yes
+
+Host github.com
+	User git

@@ -1,0 +1,118 @@
+# Ghostty theme
+# Author: Andrew Carter <@ascarter>
+
+# Adapted Ghostty default theme for Helix
+
+# -------------------
+# UI
+# -------------------
+
+"ui.cursor" = { fg = "white", modifiers = ["reversed"] }
+"ui.cursor.match" = { fg = "black", bg = "yellow", modifiers = ["bold"] }
+
+"ui.cursorline.primary" = { fg = "default", bg = "gray" }
+"ui.cursorcolumn.primary" = { fg = "default", bg = "gray" }
+
+"ui.gutter" = { bg = "default" }
+"ui.gutter.selected" = { bg = "default", modifiers = ["bold"] }
+
+"ui.linenr" = { modifiers = ["dim"] }
+"ui.linenr.selected" = { modifiers = ["bold"] }
+
+"ui.debug.breakpoint" = { fg = "red", modifiers = ["bold"] }
+"ui.debug.active" = { fg = "yellow", modifiers = ["bold"] }
+
+"ui.statusline" = { bg = "default", modifiers = ["bold"] }
+"ui.statusline.separator" = { modifiers = ["dim"] }
+"ui.statusline.inactive" = { bg = "default", modifiers = ["dim"] }
+"ui.statusline.normal" = { modifiers = ["bold"] }
+"ui.statusline.insert" = { fg = "0", bg = "light-yellow", modifiers = ["bold"] }
+"ui.statusline.select" = { fg = "white", bg = "blue", modifiers = ["bold"] }
+
+"ui.selection" = { fg = "light-blue", bg = "white", modifiers = ["reversed"] }
+# "ui.selection.primary" = { modifiers = ["bold"] }
+
+# "ui.menu" = { fg = "default", bg = "light-blue" }
+"ui.menu.selected" = { bg = "light-blue", modifiers = ["bold"] }
+"ui.menu.scroll" = { fg = "blue", bg = "light-gray" }
+
+# "ui.popup" = { bg = "gray" }
+"ui.highlight" = { fg = "light-blue", bg = "white", modifiers = ["reversed"] }
+"ui.text.focus" = { modifiers = ["bold"] }
+"ui.text.inactive" = { modifiers = ["dim"] }
+
+"ui.help" = { fg = "default", bg = "default" }
+"ui.window" = { fg = "light-gray", bg = "default", modifiers = ["dim"] }
+
+"ui.virtual" = { fg = "light-gray", modifiers = ["dim"] }
+"ui.virtual.ruler" = { bg = "default", modifiers = ["reversed"] }
+"ui.virtual.whitespace" = { modifiers = ["dim"] }
+"ui.virtual.indent-guide" = { fg = "light-gray" }
+"ui.virtual.inlay-hint" = { bg = "light-gray" }
+
+warning = "yellow"
+error = "red"
+info = "default"
+hint = "cyan"
+
+"diagnostic" = { underline = { color = "red", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "white", style = "curl" } }
+"diagnostic.info" = { underline = { color = "light-cyan", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "light-yellow", style = "curl" } }
+"diagnostic.error" = { underline = { color = "light-red", style = "curl" } }
+
+# -------------------
+# Syntax Highlighting
+# -------------------
+
+# Match tree-sitter scopes
+comment = { fg = "light-gray", modifiers = ["italic"] }
+constant = { fg = "blue", modifiers = ["bold"] }
+string = { fg = "blue" }
+variable = { modifiers = ["italic"] }
+function = { modifiers = ["bold"] }
+tag = "blue"
+namespace = { modifiers = ["bold"] }
+
+# markup
+"markup.heading" = { modifiers = ["bold"] }
+"markup.list" = { modifiers = ["bold"] }
+"markup.bold" = { modifiers = ["bold"] }
+"markup.italic" = { modifiers = ["italic"] }
+"markup.strikethrough" = { modifiers = ["dim", "crossed_out"] }
+"markup.link" = "blue"
+"markup.quote" = { modifiers = ["italic"] }
+"markup.raw.block" = { modifiers = ["italic"] }
+"markup.raw.inline" = { modifiers = ["bold"] }
+
+# diff
+"diff" = "default"
+"diff.plus" = { modifiers = ["bold"] }
+"diff.minus" = { fg = "red", modifiers = ["bold"] }
+"diff.delta" = { modifiers = ["bold", "italic"] }
+"diff.plus.gutter" = "green"
+"diff.minus.gutter" = "red"
+"diff.delta.gutter" = "cyan"
+
+# -------------------
+# Color Palette
+# -------------------
+
+black = "#1d1f21"
+red = "#cc6666"
+green = "#b5bd68"
+yellow = "#f0c674"
+blue = "#81a2be"
+magenta = "#b294bb"
+cyan = "#8abeb7"
+light-gray = "#c5c8c6"
+gray = "#666666"
+light-red = "#d54e53"
+light-green = "#b9ca4a"
+light-yellow = "#e7c547"
+light-blue = "#7aa6da"
+light-magenta = "#c397d8"
+light-cyan = "#70c0b1"
+white = "#eaeaea"
+background = "#282c34"
+default = "#ffffff"

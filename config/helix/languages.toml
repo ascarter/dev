@@ -1,0 +1,41 @@
+[language-server.ruby-lsp]
+command = "ruby-lsp"
+config = { provideFormatter = true }
+
+[language-server.standardrb]
+command = "standardrb"
+args = [ "--lsp" ]
+config = { provideFormatter = true }
+
+[[language]]
+name = "ruby"
+auto-format = true
+language-servers = [ { name = "ruby-lsp", except-features = [ "format" ]}, "standardrb" ]
+
+[language.debugger]
+name = "rdbg"
+transport = "tcp"
+command = "rdbg"
+args = ["--open"]
+port-arg = "--port {}"
+
+[[language.debugger.templates]]
+name = "script"
+request = "launch"
+completion = [ { name = "script", completion = "filename", default = "." } ]
+args = { program = "{0}" }
+
+[[language]]
+name = "rust"
+
+[language.debugger]
+name = "lldb-dap"
+transport = "stdio"
+# command = "/opt/homebrew/opt/llvm/bin/lldb-dap"
+command = "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb-dap"
+
+[[language.debugger.templates]]
+name = "binary"
+request = "launch"
+completion = [{ name = "binary", completion = "filename" }]
+args = { program = "{0}", initCommands = [ "command script import ~/.config/helix/dap/lldb_dap_rustc_primer.py" ] }

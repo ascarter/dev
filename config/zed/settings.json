@@ -1,0 +1,218 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run the `open default settings` command
+// from the command palette or from `Zed` application menu.
+{
+  "context_servers": {
+    "container-use-mcp": {
+      "source": "extension",
+      "enabled": true,
+      "settings": {
+        "cu_path": "container-use"
+      }
+    },
+    "homebrew-mcp-server": {
+      "source": "custom",
+      "enabled": true,
+      "command": "/opt/homebrew/bin/brew",
+      "args": ["mcp-server"],
+      "env": {}
+    }
+  },
+  "show_completions_on_input": false,
+  "show_edit_predictions": true,
+  "edit_predictions": {
+    "mode": "eager",
+    "enabled_in_text_threads": true
+  },
+  "agent": {
+    "profiles": {
+      "container-use": {
+        "name": "Container Use",
+        "tools": {
+          "thinking": true,
+          "fetch": false
+        },
+        "enable_all_context_servers": false,
+        "context_servers": {
+          "container-use": {
+            "tools": {
+              "environment_create": true,
+              "environment_add_service": true,
+              "environment_update": true,
+              "environment_run_cmd": true,
+              "environment_open": true,
+              "environment_file_write": true,
+              "environment_file_read": true
+            }
+          }
+        }
+      }
+    },
+    "use_modifier_to_send": true,
+    "play_sound_when_agent_done": true,
+    "default_profile": "write",
+    "always_allow_tool_actions": false,
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "claude-sonnet-4"
+    }
+  },
+  "features": {
+    "edit_prediction_provider": "copilot"
+  },
+  "theme": {
+    "mode": "system",
+    "light": "Xcode Light",
+    "dark": "Xcode Dark"
+  },
+  "ui_font_family": ".SystemUIFont",
+  "buffer_font_family": "Berkeley Mono",
+  "active_pane_modifiers": {
+    "border_size": 0.5,
+    "inactive_opacity": 0.7
+  },
+  "indent_guides": {
+    "enabled": false
+  },
+  "wrap_guides": [80],
+  "tabs": {
+    "close_position": "left",
+    "file_icons": true
+  },
+  "helix_mode": true,
+  "vim": {
+    "default_mode": "normal",
+    "toggle_relative_line_numbers": true,
+    "use_smartcase_find": true
+  },
+  "git": {
+    "inline_blame": {
+      "enabled": false
+    }
+  },
+  "project_panel": {
+    "auto_fold_dirs": false,
+    "git_status": false,
+    "indent_guides": {
+      "show": "never"
+    }
+  },
+  "outline_panel": {
+    "auto_fold_dirs": false,
+    "git_status": false,
+    "indent_guides": {
+      "show": "never"
+    }
+  },
+  "terminal": {
+    "line_height": "standard",
+    "font_size": 13
+  },
+  "journal": {
+    "hour_format": "hour24"
+  },
+  "auto_install_extensions": {
+    "docker-compose": true,
+    "dockerfile": true,
+    "liquid": true,
+    "lua": true,
+    "make": true,
+    "marksman": true,
+    "postgres-context-server": true,
+    "roc": true,
+    "ruby": true,
+    "sql": true,
+    "swift": true,
+    "toml": true,
+    "zig": true,
+    "github-theme": true
+  },
+  "languages": {
+    "Liquid": {
+      "prettier": {
+        "allowed": true,
+        "plugins": [
+          "@shopify/prettier-plugin-liquid",
+          "prettier-plugin-tailwindcss"
+        ]
+      },
+      "language_servers": [
+        "vscode-html-services",
+        "tailwindcss-language-server",
+        "..."
+      ],
+      "formatter": "language_server",
+      "format_on_save": "on"
+    },
+    "Markdown": {
+      "soft_wrap": "bounded"
+    },
+    "Ruby": {
+      "language_servers": [
+        "ruby-lsp",
+        "standardrb",
+        "tailwindcss-language-server",
+        "!solargraph",
+        "!rubocop"
+      ],
+      "formatter": "language_server",
+      "format_on_save": "on"
+    },
+    "Rust": {
+      "format_on_save": "on",
+      "wrap_guides": [100]
+    },
+    "Shell Script": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "shfmt",
+          "arguments": ["--filename", "{buffer_path}", "--indent", "2"]
+        }
+      }
+    }
+  },
+  "lsp": {
+    "ruby-lsp": {
+      "initialization_options": {
+        "experimentalFeaturesEnabled": true,
+        "formatter": "standard",
+        "linters": ["standard"],
+        "enabledFeatures": {
+          "diagnostics": false,
+          "formatting": true
+        },
+        "featuresConfiguration": {
+          "inlayHint": {
+            "implicitHashValue": true,
+            "implicitRescue": true
+          }
+        }
+      }
+    },
+    "standardrb": {
+      "initialization_options": {
+        "enabledFeatures": {
+          "diagnostics": true,
+          "formatting": false
+        }
+      }
+    },
+    "tailwindcss-language-server": {
+      "settings": {
+        "includedLanguages": {
+          "erb": "html",
+          "ruby": "html"
+        },
+        "experimental": {
+          "classRegex": ["\\bclass:\\s*['\"]([^'\"]*)['\"]"]
+        }
+      }
+    }
+  }
+}

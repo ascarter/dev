@@ -4,21 +4,8 @@
 
 # set -x
 
-# XDG Base Directory Specification
-XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
-XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
-XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
-XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
-XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}
-
-# Dev environment variables
-DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
-DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
-
-# Target directory for symlinks
+# Default values (will be overridden after option parsing)
 TARGET=${TARGET:-$HOME}
-
-# Verbose output flag
 VERBOSE=0
 
 # Files and patterns to exclude from linking
@@ -51,7 +38,15 @@ err() {
 # Usage and help
 # ------------------------------
 
+usage_options() {
+  log "Options:" ""
+  log "  -d <dir>" "Dev directory (default: ${DEV_HOME})"
+  log "  -t <dir>" "Target directory (default: ${TARGET})"
+  log "  -v" "Verbose output"
+}
+
 usage() {
+  setup_environment
   log "dev" "Development environment management tool"
   log ""
   log "Usage:" "dev [options] <command>"
@@ -65,11 +60,125 @@ usage() {
   log "  host [platform]" "Run host provisioning script"
   log "  tool [name] [action]" "Manage tool installation"
   log ""
-  log "Options:" ""
-  log "  -d <dir>" "Dev directory (default: \$DEV_HOME)"
-  log "  -t <dir>" "Target directory (default: \$HOME)"
-  log "  -v" "Verbose output"
+  usage_options
   log "  -h" "Show help"
+}
+
+# ------------------------------
+# Environment setup
+# ------------------------------
+
+setup_environment() {
+  # XDG Base Directory Specification
+  # Always derive from TARGET to ensure consistency
+  XDG_CONFIG_HOME=${TARGET}/.config
+  XDG_DATA_HOME=${TARGET}/.local/share
+  XDG_STATE_HOME=${TARGET}/.local/state
+  XDG_CACHE_HOME=${TARGET}/.cache
+  XDG_BIN_HOME=${TARGET}/.local/bin
+
+  # Dev environment variables
+  # DEV_HOME defaults to $HOME-based location unless overridden with -d
+  # DEV_CONFIG is for user overrides in the TARGET location
+  : ${DEV_HOME:=$HOME/.local/share/dev}
+  DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
+}
+
+# ------------------------------
+# Helper functions
+# ------------------------------
+
+check_symlink() {
+  # Try `realpath` (works on both macOS and Linux if installed)
+  if command -v realpath >/dev/null 2>&1; then
+    link_target=$(realpath "$1")
+    link_src=$(realpath "$2")
+  else
+    # Fallback to `readlink` for macOS and Linux
+    link_target=$(cd "$(dirname "$1")" && cd "$(dirname "$(readlink "$1")")" && pwd)/$(basename "$(readlink "$1")")
+    link_src=$(realpath "$2" 2>/dev/null || echo "$2")
+  fi
+  if [ "$link_src" = "$link_target" ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Check if directory is empty and remove it
+remove_empty_dir() {
+  if ! [ -d "${1}" ]; then
+    vlog "missing" "${1}"
+  elif [ -z "$(ls -A "${1}")" ]; then
+    log "rm" "${1}"
+    rmdir "${1}"
+  else
+    vlog "not empty" "${1}"
+  fi
+}
+
+# Sync configuration files from source to target directory
+# $1: action (list|link|unlink)
+config_sync() {
+  source_dir="${DEV_HOME}/config"
+  target_dir="${XDG_CONFIG_HOME}"
+  action="${1}"
+
+  # Build find command with exclude patterns
+  find_cmd="find \"${source_dir}\" -type f"
+  for pattern in ${EXCLUDE_PATTERNS}; do
+    find_cmd="${find_cmd} -not -name \"${pattern}\""
+  done
+
+  eval "${find_cmd}" | sort | while read -r source_file; do
+    target_file="${target_dir}/${source_file#${source_dir}/}"
+    if [ "${action}" = "list" ]; then
+      if [ -L "${target_file}" ]; then
+        if check_symlink "${target_file}" "${source_file}"; then
+          vlog "ok" "${target_file} -> ${source_file}"
+        else
+          err "invalid link ${target_file}"
+        fi
+      elif [ -e "${target_file}" ]; then
+        log "conflict" "${target_file} -> ${source_file}"
+      else
+        log "missing" "${target_file} -> ${source_file}"
+      fi
+    elif [ "${action}" = "link" ]; then
+      if [ -L "${target_file}" ]; then
+        if check_symlink "${target_file}" "${source_file}"; then
+          vlog "ok" "${target_file} -> ${source_file}"
+        else
+          err "invalid link ${target_file}"
+        fi
+        continue
+      elif [ -e "${target_file}" ]; then
+        log "conflict" "${target_file} -> ${source_file}"
+        continue
+      fi
+      mkdir -p "$(dirname "${target_file}")"
+      ln -sf "${source_file}" "${target_file}"
+      log "link" "${target_file} -> ${source_file}"
+    elif [ "${action}" = "unlink" ]; then
+      if [ -L "${target_file}" ]; then
+        rm "${target_file}"
+        log "unlink" "${target_file} -> ${source_file}"
+      fi
+    fi
+  done
+
+  # Clean up empty directories after unlinking (iteratively remove from deepest to shallowest)
+  if [ "${action}" = "unlink" ]; then
+    while true; do
+      empty_dirs=$(find "${target_dir}" -type d -empty 2>/dev/null)
+      [ -z "$empty_dirs" ] && break
+      echo "$empty_dirs" | while read -r empty_dir; do
+        if [ -d "${empty_dir}" ]; then
+          rmdir "${empty_dir}" 2>/dev/null && log "rm" "${empty_dir}"
+        fi
+      done
+    done
+  fi
 }
 
 # ------------------------------
@@ -92,27 +201,38 @@ cmd_init() {
   # TODO: Implement zsh initialization
 }
 
+config_usage() {
+  log "dev config" "Manage configuration files"
+  log ""
+  log "Usage:" "dev [options] config <action>"
+  log ""
+  log "Actions:" ""
+  log "  status" "Show configuration status"
+  log "  link" "Link configuration files"
+  log "  unlink" "Unlink configuration files"
+  log ""
+  usage_options
+}
+
 cmd_config() {
   action="$1"
   case "$action" in
   status)
-    log "config" "Show configuration status"
-    # TODO: Implement status checking
+    VERBOSE=1
+    config_sync "list"
     ;;
   link)
-    log "config" "Link configuration files"
-    # TODO: Implement linking
+    config_sync "link"
     ;;
   unlink)
-    log "config" "Unlink configuration files"
-    # TODO: Implement unlinking
-    ;;
-  "")
-    err "config: action required (status|link|unlink)"
-    exit 1
+    config_sync "unlink"
     ;;
   *)
-    err "config: unknown action '$action'"
+    if [ -n "$action" ]; then
+      err "config: unknown action '$action'"
+      log ""
+    fi
+    config_usage
     exit 1
     ;;
   esac
@@ -165,11 +285,13 @@ while getopts ":d:t:vh" opt; do
   d) DEV_HOME=$OPTARG ;;
   t) TARGET=$OPTARG ;;
   v) VERBOSE=1 ;;
-  h) usage && exit 0 ;;
-  \?) usage && exit 1 ;;
+  h | \?) usage && exit 0 ;;
   esac
 done
 shift $((OPTIND - 1))
+
+# Setup environment variables based on TARGET
+setup_environment
 
 # Get command
 command="${1:-}"
@@ -199,6 +321,10 @@ tool)
   cmd_tool "$@"
   ;;
 *)
+  if [ -n "$command" ]; then
+    err "dev: unknown command '$command'"
+    log ""
+  fi
   usage
   exit 1
   ;;

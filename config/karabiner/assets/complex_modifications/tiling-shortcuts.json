@@ -1,0 +1,90 @@
+{
+  "title": "Tiling Shortcuts",
+  "rules": [
+    {
+      "description": "Tiling shortcuts using vim key navigation",
+      "manipulators": [
+        {
+          "from": {
+            "key_code": "h",
+            "modifiers": {
+              "mandatory": ["left_shift", "left_option", "left_command"],
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "left_arrow",
+              "modifiers": ["left_control", "fn"]
+            }
+          ],
+          "type": "basic"
+        },
+        {
+          "from": {
+            "key_code": "l",
+            "modifiers": {
+              "mandatory": ["left_shift", "left_option", "left_command"],
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "right_arrow",
+              "modifiers": ["left_control", "fn"]
+            }
+          ],
+          "type": "basic"
+        },
+        {
+          "from": {
+            "key_code": "j",
+            "modifiers": {
+              "mandatory": ["left_shift", "left_option", "left_command"],
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "down_arrow",
+              "modifiers": ["left_control", "fn"]
+            }
+          ],
+          "type": "basic"
+        },
+        {
+          "from": {
+            "key_code": "k",
+            "modifiers": {
+              "mandatory": ["left_shift", "left_option", "left_command"],
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "up_arrow",
+              "modifiers": ["left_control", "fn"]
+            }
+          ],
+          "type": "basic"
+        },
+        {
+          "from": {
+            "key_code": "f",
+            "modifiers": {
+              "mandatory": ["left_shift", "left_option", "left_command"],
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "f",
+              "modifiers": ["left_control", "fn"]
+            }
+          ],
+          "type": "basic"
+        }
+      ]
+    }
+  ]
+}

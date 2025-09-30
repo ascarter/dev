@@ -1,0 +1,105 @@
+[core]
+	autocrlf = input
+	pager = less --chop-long-lines
+
+[init]
+	defaultBranch = main
+
+[color]
+	ui = auto
+
+[color "status"]
+	header = default
+	added = default
+	updated = default
+	changed = default
+	untracked = default
+	branch = default bold
+	localBranch = default bold
+	remoteBranch = default bold
+	unmerged = red bold italic
+
+[color "diff"]
+	meta = default
+	frag = default bold ul
+	context = default dim
+	old = red bold italic
+	new = blue bold
+	commit = default bold
+
+[color "branch"]
+	current = default bold
+	local = default
+	remote = default italic
+	upstream = default bold italic
+	plain = default
+
+[color "decorate"]
+	branch = default bold
+	remoteBranch = default italic
+	tag = default bold
+	stash = default italic
+	HEAD = default italic
+
+[instaweb]
+	httpd = webrick
+
+[diff]
+	gui = auto
+
+[merge]
+	gui = auto
+
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
+
+[mergetool "vscode"]
+	cmd = code --wait --merge $REMOTE $LOCAL $BASE $MERGED
+
+[difftool "zed"]
+  cmd = zed --wait --diff $LOCAL $REMOTE
+
+[alias]
+	aliases = !git config --get-regexp alias | cut -c 7-
+	amend = commit --amend
+	begin = checkout -b
+	blocal = rev-parse --abbrev-ref HEAD
+	bremote = rev-parse --abbrev-ref --symbolic-full-name @{u}
+	changelog = log --oneline --decorate --no-merges
+	changes = diff --name-status -r
+	cleanup = !git checkout master && git branch --merged | grep -v \" master\" | xargs git branch -d
+	contributors = shortlog --summary --numbered --email
+	difflast = diff HEAD^ HEAD
+	diffstat = diff --stat -r
+	dirty = status --untracked-files=normal --porcelain
+	discard = checkout --
+	dump = cat-file -p
+	fixauthor = commit --amend --reset-author
+	gdiff = difftool --gui --no-prompt
+	glog = !serie
+	hist = log --pretty=format:\"%C(yellow)%h %C(green)%ad %C(cyan)%an %Cred%d %Creset%s%d\" --graph --date=local --stat
+	last = log --stat --date=local -1
+	lc = log ORIG_HEAD.. --stat --no-merges
+	lg = llog --patch
+	ll = log --pretty=format:\"%C(yellow)%h %C(green)%ad %C(cyan)%an %Cred%d %Creset%s\" --decorate --date=format-local:\"%b %e %Y %R\" --graph --all
+	llast = last --patch
+	llog = log --stat --date=local
+	logd = log --date=local -- .
+	ls = log --oneline --graph --all
+	prune-all = !git remote | xargs -n 1 git remote prune
+	pullref = rev-parse --abbrev-ref @{push}
+	remotes = remote --verbose
+	root = rev-parse --show-toplevel
+	setemail = !git config user.email
+	sha = rev-parse --verify HEAD
+	tags = tag -l
+	undo = reset --soft HEAD^
+	unstage = restore --staged
+	untrack = rm --cache --
+	upstream = !git branch -vv --list $(git blocal)
+	visual = !github open $(git root)
+	whoami = config user.email
+	showdirty = config devcontainers-theme.show-dirty 1
+	hidedirty = config --unset devcontainers-theme.show-dirty
+	showstatus = config --unset devcontainers-theme.hide-status
+	hidestatus = config devcontainers-theme.hide-status 1

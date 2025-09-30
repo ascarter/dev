@@ -1,0 +1,122 @@
+" Set <space> as leader key
+let mapleader = " "
+let maplocalleader = " "
+
+" -------------------------------------
+" Interface settings
+" -------------------------------------
+set number
+set relativenumber
+
+set cursorline
+set scrolloff=10
+set mouse=a
+set breakindent
+
+" Filetypes
+filetype on
+filetype plugin indent on
+syntax on
+
+" Case-insensitive searching UNLESS \C or one or more capital letters in the search term
+set ignorecase
+set smartcase
+
+" Configure how new splits should be opened
+set splitright
+set splitbelow
+
+" turn on “list” mode to show whitespace
+set list
+
+" configure which symbols to use
+"  · (dot)      for trailing spaces
+"  »·<space>    for tabs
+"  ␣ (open box) for non‑breaking spaces
+set listchars=tab:»\ ,trail:·,nbsp:␣
+
+" When an operation that would fail due to unsaved changes, raise a dialog
+" See `:help 'confirm'`
+set confirm
+
+" Use system clipboard
+if has("nvim")
+  " Neovim: schedule setting clipboard (to avoid timing issues)
+  lua vim.schedule(function() vim.opt.clipboard = 'unnamedplus' end)
+else
+  " Vim: set clipboard if available
+  if has("clipboard")
+    set clipboard=unnamedplus
+  endif
+endif
+
+" Statusline
+set noshowmode
+set noruler
+set laststatus=2
+set statusline=%!ModeStatusLine()
+
+function! ModeStatusLine()
+  let l:ms = mode()
+  if l:ms ==# 'n'
+    let l:hl = '%#ModeNormal#'
+    let l:modetext = ' NOR '
+  elseif l:ms ==# 'i'
+    let l:hl = '%#ModeInsert#'
+    let l:modetext = ' INS '
+  elseif l:ms =~# '\v^[vV\x16]'
+    let l:hl = '%#ModeVisual#'
+    let l:modetext = ' VIS '
+  else
+    " fallback for Replace, Select, etc.
+    let l:hl   = '%#ModeNormal#'
+    let l:modetext = '     '
+  endif
+
+  " Build status line
+  let l:left = l:hl . l:modetext . '%*' . ' %n %f %m%r'
+  let l:center = '%q%w' . &filetype
+  let l:right = '%l:%c %L %p%%'
+  "let l:fileinfo = ' %f %m %= %l:%c %L %p'
+  "return l:hl . l:modetext . '%*' . l:fileinfo
+  return l:left . '%=' . l:center . '%=' . l:right
+endfunction
+
+" Group for number-toggle autocmds
+augroup NumberToggle
+  autocmd!
+  " When entering Insert mode, disable relative numbers
+  autocmd InsertEnter * set norelativenumber
+  " When leaving Insert mode, re-enable relative numbers
+  autocmd InsertLeave * set relativenumber
+augroup END
+
+" -------------------------------------
+" Keymaps
+" -------------------------------------
+
+" Clear search highlighting when pressing <Esc> in normal mode
+nnoremap <Esc> :nohlsearch<CR>
+
+" Exit terminal mode with <Esc><Esc>
+tnoremap <Esc><Esc> <C-\><C-n>
+
+" Split-window navigation
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Move windows with Ctrl+Shift+{hjkl}
+nnoremap <C-S-h> <C-w>H
+nnoremap <C-S-j> <C-w>J
+nnoremap <C-S-k> <C-w>K
+nnoremap <C-S-l> <C-w>L
+
+" -------------------------------------
+" Colorscheme
+" -------------------------------------
+" Use ANSI 16 colors from terminal
+colorscheme ansi
+
+" vim: ts=2 sts=2 sw=2 et

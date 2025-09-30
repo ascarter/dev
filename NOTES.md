@@ -323,3 +323,33 @@ eval "$(dev env)"
 - ✅ Works when sourced in sh
 - ✅ Sets all environment variables correctly
 - ✅ Adds bin directories to PATH
+
+---
+
+### `dev config` - COMPLETED (2025-09-29)
+
+Manages configuration file symlinks from `config/` to `$XDG_CONFIG_HOME`.
+
+**Implementation:**
+- Ported config files from dotfiles `src/.config/` to dev `config/`
+- TARGET resolution: Always set first, XDG paths derived from TARGET
+- Links everything under `config/` to `$TARGET/.config` (XDG_CONFIG_HOME)
+- Three actions: status, link, unlink
+- Supports -t option to test with temp directories without affecting $HOME
+
+**Key Functions:**
+- `setup_environment()` - Sets XDG and DEV variables based on TARGET
+- `sync()` - Main sync engine (ported from dotfiles)
+- `check_symlink()` - Validates symlink targets
+- `remove_empty_dir()` - Cleans up empty directories on unlink
+
+**Testing:**
+- ✅ Status shows missing/ok/conflict/invalid links
+- ✅ Link creates all symlinks correctly
+- ✅ Unlink removes symlinks and empty directories
+- ✅ -t option works to test without affecting $HOME
+- ✅ Verbose mode shows all operations
+- ✅ Respects EXCLUDE_PATTERNS (.DS_Store, etc.)
+
+**Config files ported:**
+- ghostty, git, helix, homebrew, irb, karabiner, nano, readline, ssh, vim, zed

@@ -1,0 +1,22 @@
+set editing-mode vi
+set show-mode-in-prompt on
+
+# Insert mode -> Beam (\e[5 q)
+# Normal mode -> Block (\e[2 q)
+set vi-ins-mode-string \1\e[5 q\2
+set vi-cmd-mode-string \1\e[2 q\2
+
+set keymap vi-insert
+
+# History navigation
+"\C-p": previous-history    # ^P → up‐history
+"\C-n": next-history        # ^N → down‐history
+
+# Delete/backspace
+"\C-?": backward-delete-char  # ^? (DEL) → backward‐delete‐char
+"\C-h": backward-delete-char   # ^H (BS)  → backward‐delete‐char
+
+# Kill‐word
+"\C-w": backward-kill-word     # ^W → backward‐kill‐word
+
+# vim: set ft=sh ts=2 sw=2 et:
