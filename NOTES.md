@@ -549,3 +549,66 @@ dev host    # Auto-detects platform and runs provisioning
 **Testing:**
 - ✅ Scripts created and executable
 - ✅ Match patterns from dotfiles
+
+---
+
+## Tools System - COMPLETED (2025-09-30)
+
+### Implementation
+
+**Approach:** Structured tools with install/update/uninstall/status actions
+
+**Command:**
+```bash
+dev tool                    # List available tools
+dev tool <name>            # Show tool status (default)
+dev tool <name> install    # Install the tool
+dev tool <name> update     # Update the tool
+dev tool <name> uninstall  # Remove the tool
+dev tool <name> status     # Show tool status
+```
+
+**Tools Ported (11 total):**
+
+*Language Toolchains (5):*
+- rust.sh - Rust via rustup
+- ruby.sh - Ruby via rbenv
+- go.sh - Go language toolchain
+- python.sh - Python via uv
+- nodejs.sh - Node.js via fnm
+
+*Package Managers (2):*
+- homebrew.sh - Homebrew for macOS/Linux
+- flatpak.sh - Flatpak for Linux
+
+*Applications (3):*
+- claude.sh - Claude Code CLI
+- tailscale.sh - Tailscale VPN client
+- zed.sh - Zed editor
+
+*Utilities (1):*
+- ubi.sh - GitHub release binary installer
+
+**Scripts Directory (9 utility/config scripts):**
+- Configuration: github.sh, gpg.sh, ssh.sh
+- Backup/Restore: gpg-backup.sh, gpg-restore.sh
+- Specialized: ssh-yk.sh, yubico.sh, tailnet.sh, steam.sh
+
+**Design Decisions:**
+1. **Structured actions** - Each tool implements relevant actions (install/update/uninstall/status)
+2. **Flexible interface** - Tools self-document which actions they support
+3. **Separate scripts/** - Configuration and specialized scripts go in scripts/ directory
+4. **Package managers as tools** - homebrew and flatpak are tools, not host-level
+5. **Host integration** - Host scripts use tools when available with fallbacks
+
+**Host Script Updates:**
+- macOS uses `dev tool homebrew install` when available
+- Fedora uses `dev tool flatpak update` when available
+- Both have fallbacks for bootstrap scenarios
+
+**Testing:**
+- ✅ dev tool command lists all 11 tools
+- ✅ Tool status checking works
+- ✅ Homebrew tool adapted with full action support
+- ✅ Flatpak tool created with full action support
+- ✅ Host scripts integrate with tools system

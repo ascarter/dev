@@ -24,11 +24,20 @@ else
 fi
 
 # Homebrew
-HOMEBREW_PREFIX="/opt/homebrew"
-if ! [ -d "${HOMEBREW_PREFIX}" ]; then
+if ! command -v brew >/dev/null 2>&1; then
   echo "Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
+  # Use dev tool to install homebrew if dev command is available
+  if command -v dev >/dev/null 2>&1; then
+    dev tool homebrew install
+  else
+    # Fallback to direct installation
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+
+  # Ensure brew is in PATH
+  if [ -f /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
 else
   echo "Homebrew: OK"
 fi

@@ -54,7 +54,11 @@ silverblue | cosmic-atomic)
   # Update flatpaks
   if command -v flatpak >/dev/null 2>&1; then
     echo "Updating Flatpaks..."
-    flatpak update -y
+    if command -v dev >/dev/null 2>&1; then
+      dev tool flatpak update
+    else
+      flatpak update -y
+    fi
   fi
   ;;
 

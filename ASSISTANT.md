@@ -30,10 +30,11 @@ The system is built around a central `bin/dev` tool that will manage the develop
 
 ## Directory Structure
 
-- `bin/` - Main `dev` tool and helper scripts (can be scripts)
+- `bin/` - Main `dev` tool and helper scripts
 - `config/` - Configuration files symlinked to `$XDG_CONFIG_HOME` or specific target directories
 - `hosts/` - Platform-specific provisioning (macos, fedora, ubuntu)
-- `tools/` - Idempotent tool installation scripts for development tools, languages, frameworks, and applications
+- `tools/` - Installable tools managed via `dev tool` command (languages, package managers, applications)
+- `scripts/` - Utility and configuration scripts run directly (GPG, SSH, YubiKey, backups)
 - `docs/` - Documentation
 
 ## Installation
@@ -109,8 +110,9 @@ User-specific configurations can be placed in `$XDG_CONFIG_HOME/dev/` to overrid
 - Use .editorconfig settings instead of modelines in the files
 - Do not create git commits unless instructed to do so
 
-## Hosts and Tools System
+## Hosts, Tools, and Scripts System
 
+### Hosts
 The `hosts/` directory contains platform-specific provisioning scripts for macOS, Fedora, and Ubuntu. These scripts are fully idempotent - they check current state, install what's missing, and update what exists. Each script can be run multiple times safely and will bring the system to the desired state.
 
 **Host Provisioning:**
@@ -120,12 +122,49 @@ The `hosts/` directory contains platform-specific provisioning scripts for macOS
 
 All host scripts are idempotent - they install missing packages and update existing ones in a single run.
 
-The `tools/` directory will contain idempotent provisioning scripts for:
-- Development tools
-- Languages and frameworks
-- Applications
+### Tools
+The `tools/` directory contains installable development tools managed via `dev tool <name> <action>`. Each tool script supports actions that make sense for that tool (typically: install, update, uninstall, status).
 
-All scripts can be run independently and repeatedly without issues. *(Tools not yet implemented)*
+**Tool Categories:**
+
+*Language Toolchains:*
+- `rust.sh` - Rust via rustup
+- `ruby.sh` - Ruby via rbenv
+- `go.sh` - Go language toolchain
+- `python.sh` - Python via uv
+- `nodejs.sh` - Node.js via fnm
+
+*Package Managers:*
+- `homebrew.sh` - Homebrew for macOS/Linux
+- `flatpak.sh` - Flatpak for Linux
+
+*Applications:*
+- `claude.sh` - Claude Code CLI
+- `tailscale.sh` - Tailscale VPN client
+- `zed.sh` - Zed editor
+
+*Utilities:*
+- `ubi.sh` - GitHub release binary installer
+
+All tools support standard actions (install/update/uninstall/status) and can be run independently and repeatedly without issues.
+
+### Scripts
+The `scripts/` directory contains utility and configuration scripts that are run directly rather than through `dev tool`. These handle specialized configuration, backups, and platform-specific setup.
+
+**Configuration Scripts:**
+- `gpg.sh` - GPG configuration
+- `ssh.sh` - SSH configuration
+- `github.sh` - GitHub CLI setup
+
+**Backup/Restore:**
+- `gpg-backup.sh` - Backup GPG keys
+- `gpg-restore.sh` - Restore GPG keys
+
+**Specialized Setup:**
+- `ssh-yk.sh` - YubiKey SSH configuration
+- `yubico.sh` - YubiKey tools setup
+- `tailnet.sh` - Tailscale network setup
+- `steam.sh` - Steam gaming platform
 
 ## Implementation Status
 
@@ -136,15 +175,16 @@ All scripts can be run independently and repeatedly without issues. *(Tools not 
 - ✅ `dev edit` - Opens DEV_HOME in $EDITOR
 - ✅ `dev config` - Complete symlink management (status/link/unlink)
 - ✅ `dev host` - Idempotent platform provisioning (auto-detects platform)
+- ✅ `dev tool` - Tool installation management (install/update/uninstall/status)
 - ✅ `config/` - All configuration files ported from dotfiles
 - ✅ `config/zsh/` - ZSH configuration with rc.d modules
 - ✅ `hosts/` - Platform scripts (macos, fedora, ubuntu) - fully idempotent
+- ✅ `tools/` - 11 tool installation scripts (languages, package managers, applications)
+- ✅ `scripts/` - 9 utility and configuration scripts
 - ✅ `install.sh` and `uninstall.sh` - Bootstrap scripts
 
 **To Do:**
 - ⏳ `dev update` - Git update and re-link
-- ⏳ `dev tool` - Tool installation management
-- ⏳ `tools/` - Tool installation scripts
 
 ## Code Patterns
 

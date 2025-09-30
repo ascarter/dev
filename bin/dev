@@ -333,18 +333,65 @@ cmd_host() {
   "${host_script}"
 }
 
+tool_usage() {
+  log "dev tool" "Manage development tools"
+  log ""
+  log "Usage:" "dev [options] tool <name> [action]"
+  log ""
+  log "Actions:" ""
+  log "  install" "Install the tool"
+  log "  uninstall" "Uninstall the tool"
+  log "  update" "Update the tool"
+  log "  status" "Show tool status (default)"
+  log "  setup" "Configure the tool (for config-only tools)"
+  log ""
+  log "If no action specified, shows status"
+  log ""
+  usage_options
+}
+
 cmd_tool() {
-  tool_name="$1"
-  action="$2"
-  if [ -z "$tool_name" ]; then
-    log "tool" "Available tools:"
-    # TODO: List available tools
-  elif [ -z "$action" ]; then
-    log "tool" "Actions: install, uninstall, status, update"
-  else
-    log "tool" "$action $tool_name"
-    # TODO: Execute tool action
+  tool_name="${1:-}"
+  action="${2:-status}"
+
+  # Check for help
+  case "${tool_name}" in
+  -h | --help | "")
+    if [ -z "$tool_name" ]; then
+      # List available tools
+      log "tool" "Available tools:"
+      log ""
+      for tool in "${DEV_HOME}/tools"/*.sh; do
+        [ -f "$tool" ] && log "  $(basename "$tool" .sh)"
+      done
+      log ""
+      tool_usage
+    else
+      tool_usage
+    fi
+    return 0
+    ;;
+  esac
+
+  tool_script="${DEV_HOME}/tools/${tool_name}.sh"
+
+  if [ ! -f "$tool_script" ]; then
+    err "No tool found: $tool_name"
+    log ""
+    log "Available tools:"
+    for tool in "${DEV_HOME}/tools"/*.sh; do
+      [ -f "$tool" ] && log "  $(basename "$tool" .sh)"
+    done
+    exit 1
   fi
+
+  if [ ! -x "$tool_script" ]; then
+    err "Tool script not executable: $tool_script"
+    exit 1
+  fi
+
+  vlog "tool" "Running ${tool_name} ${action}"
+  "${tool_script}" "${action}"
 }
 
 # ------------------------------
