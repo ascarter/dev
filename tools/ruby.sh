@@ -8,13 +8,13 @@ RUBY_CONFIGURE_OPTS="--enable-yjit"
 
 # Use devlog for consistent logging
 log() {
-  "$(dirname "$0")/../bin/devlog" log "$@"
+  "$(dirname "$0")/../bin/devlog" "$@"
 }
 
 latest() {
   # Verify rustc is available
   if ! command -v rustc >/dev/null 2>&1; then
-    log "ruby-build" "rustc is required to build Ruby with YJIT support"
+    log error "ruby-build" "rustc is required to build Ruby with YJIT support"
     return 1
   fi
 
@@ -26,13 +26,13 @@ latest() {
     ruby_ver=$(rbenv install --list | grep -E '^[0-9].[0-9]+.[0-9]+' | sort -V | tail -n 1)
 
     if ! rbenv versions | grep $ruby_ver; then
-      log "ruby-build" "installing latest Ruby version: $ruby_ver"
+      log info "ruby-build" "installing latest Ruby version: $ruby_ver"
       rbenv install $ruby_ver
     else
-      log "ruby-build" "latest Ruby version $ruby_ver already installed"
+      log info "ruby-build" "latest Ruby version $ruby_ver already installed"
     fi
   else
-    log "ruby" "rbenv not installed, cannot install latest Ruby"
+    log error "ruby" "rbenv not installed, cannot install latest Ruby"
     return 1
   fi
 }
@@ -40,14 +40,14 @@ latest() {
 install() {
   # Check if rbenv is already installed
   if [ -d "${RBENV_ROOT}" ] && command -v "${RBENV_ROOT}/bin/rbenv" >/dev/null 2>&1; then
-    log "rbenv" "already installed, skipping"
+    log info "rbenv" "already installed, skipping"
   else
     if ! command -v git >/dev/null 2>&1; then
-      log "ruby" "git is required for installation"
+      log error "ruby" "git is required for installation"
       return 1
     fi
 
-    log "ruby" "installing rbenv with git to ${RBENV_ROOT}"
+    log info "ruby" "installing rbenv with git to ${RBENV_ROOT}"
 
     # Install rbenv
     mkdir -p "${RBENV_ROOT}"
@@ -67,16 +67,16 @@ install() {
   # Install most current Ruby
   latest
 
-  log "ruby" "rbenv installed successfully"
+  log info "ruby" "rbenv installed successfully"
 }
 
 update() {
   if [ ! -d "${RBENV_ROOT}" ]; then
-    log "ruby" "not installed"
+    log info "ruby" "not installed"
     return 1
   fi
 
-  log "ruby" "updating rbenv and ruby-build"
+  log info "ruby" "updating rbenv and ruby-build"
 
   # Update rbenv
   cd "${RBENV_ROOT}"
@@ -98,10 +98,10 @@ update() {
 
 uninstall() {
   if [ -d "${RBENV_ROOT}" ]; then
-    log "ruby" "removing rbenv installation"
+    log info "ruby" "removing rbenv installation"
     rm -rf "${RBENV_ROOT}"
   else
-    log "ruby" "already uninstalled"
+    log info "ruby" "already uninstalled"
   fi
 }
 
@@ -109,9 +109,9 @@ status() {
   if [ -d "${RBENV_ROOT}" ] && [ -x "${RBENV_ROOT}/bin/rbenv" ]; then
     local current_version
     current_version=$("${RBENV_ROOT}/bin/rbenv" version-name 2>/dev/null || echo "none")
-    log "ruby" "rbenv installed, current: ${current_version}"
+    log info "ruby" "rbenv installed, current: ${current_version}"
   else
-    log "ruby" "not installed"
+    log info "ruby" "not installed"
   fi
 }
 

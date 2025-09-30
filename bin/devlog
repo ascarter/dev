@@ -3,27 +3,28 @@
 # devlog - Standard logging helper for dev scripts
 #
 # Usage:
-#   devlog log <label> [message]     - Log with bold label and message
-#   devlog info <label> [message]    - Info message (same as log)
+#   devlog <message>                 - Log message with default (info) level
+#   devlog info <label> [message]    - Info message (default)
 #   devlog warn <label> [message]    - Warning message (yellow label)
 #   devlog error <label> [message]   - Error message (red label, stderr)
-#   devlog verbose <label> [message] - Log only if VERBOSE=1
+#   devlog debug <label> [message]   - Log only if VERBOSE=1
 #
 # Environment Variables:
 #   DEVLOG_WIDTH - Field width for label column (default: 16)
 #   VERBOSE      - Enable verbose logging (0 or 1)
 #
 # Examples:
-#   devlog log "install" "Installing package"
+#   devlog "Simple message"
+#   devlog info "install" "Installing package"
 #   devlog warn "deprecated" "This feature is deprecated"
 #   devlog error "failed" "Installation failed"
-#   devlog verbose "debug" "Debug information"
-#   DEVLOG_WIDTH=26 devlog log "long label" "Custom width"
+#   devlog debug "trace" "Debug information"
+#   DEVLOG_WIDTH=26 devlog info "long label" "Custom width"
 #
 # Integration in scripts:
 #   # Wrapper function for convenience
 #   log() {
-#     "$(dirname "$0")/../bin/devlog" log "$@"
+#     "$(dirname "$0")/../bin/devlog" info "$@"
 #   }
 
 set -eu
@@ -32,14 +33,18 @@ set -eu
 FIELD_WIDTH=${DEVLOG_WIDTH:-16}
 
 log_format() {
-  label="$1"
+  label="${1:-}"
   message="${2:-}"
   color="${3:-}"
 
   # Treat empty string as "no message" (same as missing argument)
   if [ -z "$message" ] || [ "$#" -lt 2 ]; then
     # Single argument or empty message - just print it
-    printf "%s\n" "$label"
+    if [ -n "$color" ]; then
+      printf "${color}%s$(tput sgr0)\n" "$label"
+    else
+      printf "%s\n" "$label"
+    fi
   else
     # Two arguments - format with label and message
     if [ -n "$color" ]; then
@@ -50,30 +55,47 @@ log_format() {
   fi
 }
 
-level="${1:-log}"
-shift 2>/dev/null || true
+# Parse arguments to determine level, label, and message
+if [ "$#" -eq 0 ]; then
+  echo "devlog: no arguments provided" >&2
+  echo "Usage: devlog {info|warn|error|debug} <label> [message]" >&2
+  echo "       devlog <message>" >&2
+  exit 1
+fi
 
-case "$level" in
-log | info)
-  log_format "$@"
-  ;;
-warn | warning)
-  # Yellow text for warnings
-  log_format "$@" "$(tput setaf 3)"
-  ;;
-error | err)
-  # Red text for errors, output to stderr
-  log_format "$@" "$(tput setaf 1)" >&2
-  ;;
-verbose)
-  # Only log if VERBOSE is set
-  if [ "${VERBOSE:-0}" -eq 1 ]; then
-    log_format "$@"
-  fi
+# Check if first argument is a known level and canonicalize it
+case "$1" in
+info | warn | error | debug)
+  level="$1"
+  shift
+  label="${1:-}"
+  message="${2:-}"
   ;;
 *)
-  echo "devlog: unknown level '$level'" >&2
-  echo "Usage: devlog {log|info|warn|error|verbose} <label> [message]" >&2
-  exit 1
+  # First arg is not a level, treat as label with default level (info)
+  level="info"
+  label="$1"
+  message=""
+  ;;
+esac
+
+# Now execute based on level, passing clear parameters
+case "$level" in
+info)
+  log_format "$label" "$message"
+  ;;
+warn)
+  # Yellow text for warnings
+  log_format "$label" "$message" "$(tput setaf 3)"
+  ;;
+error)
+  # Red text for errors, output to stderr
+  log_format "$label" "$message" "$(tput setaf 1)" >&2
+  ;;
+debug)
+  # Only log if VERBOSE is set
+  if [ "${VERBOSE:-0}" -eq 1 ]; then
+    log_format "$label" "$message"
+  fi
   ;;
 esac

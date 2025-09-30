@@ -6,22 +6,22 @@ set -eu
 
 # Use devlog for consistent logging
 log() {
-  "$(dirname "$0")/../bin/devlog" log "$@"
+  "$(dirname "$0")/../bin/devlog" "$@"
 }
 
 install() {
   if ! command -v flatpak >/dev/null 2>&1; then
-    log "flatpak" "flatpak not available on this system"
+    log info "flatpak" "flatpak not available on this system"
     return 1
   fi
 
-  log "flatpak" "enabling Flathub remote"
+  log info "flatpak" "enabling Flathub remote"
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-  log "flatpak" "updating flatpak repositories"
+  log info "flatpak" "updating flatpak repositories"
   flatpak update -y
 
-  log "flatpak" "installing core applications"
+  log info "flatpak" "installing core applications"
   flatpak install -y flathub com.github.tchx84.Flatseal
   flatpak install -y flathub com.vivaldi.Vivaldi
   flatpak install -y flathub io.github.shiftey.Desktop
@@ -32,14 +32,14 @@ install() {
   # Desktop-specific applications
   case "${XDG_CURRENT_DESKTOP:-}" in
   COSMIC)
-    log "flatpak" "installing COSMIC desktop applications"
+    log info "flatpak" "installing COSMIC desktop applications"
     flatpak install -y flathub com.jwestall.Forecast
     flatpak install -y flathub dev.deedles.Trayscale
     flatpak install -y flathub dev.edfloreshz.Calculator
     flatpak install -y flathub io.github.cosmic_utils.Examine
     ;;
   GNOME)
-    log "flatpak" "installing GNOME desktop applications"
+    log info "flatpak" "installing GNOME desktop applications"
     flatpak install -y fedora org.gnome.Connections
     flatpak install -y fedora org.gnome.Extensions
     flatpak install -y fedora org.gnome.Loupe
@@ -50,52 +50,52 @@ install() {
 
   # Set default applications
   if command -v xdg-settings >/dev/null 2>&1; then
-    log "flatpak" "setting default web browser"
+    log info "flatpak" "setting default web browser"
     xdg-settings set default-web-browser com.vivaldi.Vivaldi.desktop
   fi
 
-  log "flatpak" "installation complete"
+  log info "flatpak" "installation complete"
 }
 
 update() {
   if ! command -v flatpak >/dev/null 2>&1; then
-    log "flatpak" "not installed"
+    log info "flatpak" "not installed"
     return 1
   fi
 
-  log "flatpak" "updating flatpak applications"
+  log info "flatpak" "updating flatpak applications"
   flatpak update -y
 
-  log "flatpak" "cleaning up unused runtimes"
+  log info "flatpak" "cleaning up unused runtimes"
   flatpak uninstall --unused -y
 }
 
 uninstall() {
   if ! command -v flatpak >/dev/null 2>&1; then
-    log "flatpak" "not installed"
+    log info "flatpak" "not installed"
     return 0
   fi
 
-  log "flatpak" "uninstalling all flatpak applications"
+  log info "flatpak" "uninstalling all flatpak applications"
   flatpak uninstall --all -y
 
-  log "flatpak" "removing Flathub remote"
+  log info "flatpak" "removing Flathub remote"
   flatpak remote-delete flathub --force
 }
 
 status() {
   if ! command -v flatpak >/dev/null 2>&1; then
-    log "flatpak" "flatpak not available"
+    log info "flatpak" "flatpak not available"
     return 0
   fi
 
   local version
   version=$(flatpak --version 2>/dev/null | cut -d' ' -f2 || echo "unknown")
-  log "flatpak" "version: ${version}"
+  log info "flatpak" "version: ${version}"
 
   local app_count
   app_count=$(flatpak list --app 2>/dev/null | wc -l)
-  log "flatpak" "installed applications: ${app_count}"
+  log info "flatpak" "installed applications: ${app_count}"
 }
 
 # Handle command line arguments

@@ -8,7 +8,7 @@ GOROOT="${GOROOT:-${XDG_DATA_HOME}/go}"
 
 # Use devlog for consistent logging
 log() {
-  "$(dirname "$0")/../bin/devlog" log "$@"
+  "$(dirname "$0")/../bin/devlog" "$@"
 }
 
 install() {
@@ -18,7 +18,7 @@ install() {
   Linux*) os="linux" ;;
   Darwin*) os="darwin" ;;
   *)
-    log "go" "unsupported OS: $(uname -s)"
+    log info "go" "unsupported OS: $(uname -s)"
     return 1
     ;;
   esac
@@ -27,19 +27,19 @@ install() {
   x86_64) arch="amd64" ;;
   aarch64 | arm64) arch="arm64" ;;
   *)
-    log "go" "unsupported architecture: $(uname -m)"
+    log info "go" "unsupported architecture: $(uname -m)"
     return 1
     ;;
   esac
 
   # Check dependencies
   if ! command -v curl >/dev/null 2>&1; then
-    log "go" "curl is required for installation"
+    log info "go" "curl is required for installation"
     return 1
   fi
 
   if ! command -v jq >/dev/null 2>&1; then
-    log "go" "jq is required for installation"
+    log info "go" "jq is required for installation"
     return 1
   fi
 
@@ -50,7 +50,7 @@ install() {
   elif command -v sha256sum >/dev/null 2>&1 && sha256sum -c </dev/null >/dev/null 2>&1; then
     SHASUM_CMD="sha256sum -c"
   else
-    log "go" "shasum or GNU sha256sum is required for installation"
+    log info "go" "shasum or GNU sha256sum is required for installation"
     return 1
   fi
 
@@ -74,7 +74,7 @@ EOF
 
   # Verify version found
   if [ -z "$version" ] || [ -z "$filename" ] || [ -z "$checksum" ]; then
-    log "go" "no matching stable release found for '$arch-$os'"
+    log info "go" "no matching stable release found for '$arch-$os'"
     return 1
   fi
 
@@ -83,29 +83,29 @@ EOF
     local current_version_output
     current_version_output=$("${GOROOT}/bin/go" version 2>/dev/null || echo "")
     if [ "$current_version_output" = "go version $version $os/$arch" ]; then
-      log "go" "already installed latest version $version"
+      log info "go" "already installed latest version $version"
       return 0
     fi
   fi
 
-  log "go" "installing Go $version to ${GOROOT}"
+  log info "go" "installing Go $version to ${GOROOT}"
 
   # Download to temporary file
   local tmpfile
   tmpfile=$(mktemp)
   trap 'rm -f "$tmpfile"' EXIT
 
-  log "go" "downloading $filename"
+  log info "go" "downloading $filename"
   if ! curl -fsSL -o "$tmpfile" "https://go.dev/dl/$filename"; then
-    log "go" "failed to download Go"
+    log error "go" "failed to download Go"
     return 1
   fi
 
   # Verify checksum
-  log "go" "verifying checksum"
+  log info "go" "verifying checksum"
   echo "$checksum  $tmpfile" | $SHASUM_CMD >/dev/null 2>&1
   if [ $? -ne 0 ]; then
-    log "go" "checksum verification failed"
+    log error "go" "checksum verification failed"
     return 1
   fi
 
@@ -115,34 +115,34 @@ EOF
   fi
 
   # Extract Go
-  log "go" "extracting to ${GOROOT}"
+  log info "go" "extracting to ${GOROOT}"
   mkdir -p "${GOROOT}"
   if ! tar -xzf "$tmpfile" -C "${GOROOT}" --strip-components=1; then
-    log "go" "failed to extract Go"
+    log error "go" "failed to extract Go"
     rm -rf "${GOROOT}"
     return 1
   fi
 
-  log "go" "installation complete"
+  log info "go" "installation complete"
 }
 
 update() {
   if ! [ -d "${GOROOT}" ]; then
-    log "go" "not installed"
+    log info "go" "not installed"
     return 1
   fi
 
-  log "go" "updating Go installation"
+  log info "go" "updating Go installation"
   # For Go, update is essentially reinstall
   install
 }
 
 uninstall() {
   if [ -d "${GOROOT}" ]; then
-    log "go" "removing Go installation"
+    log info "go" "removing Go installation"
     rm -rf "${GOROOT}"
   else
-    log "go" "already uninstalled"
+    log info "go" "already uninstalled"
   fi
 }
 
@@ -150,9 +150,9 @@ status() {
   if [ -d "${GOROOT}" ] && [ -x "${GOROOT}/bin/go" ]; then
     local current_version
     current_version=$("${GOROOT}/bin/go" version 2>/dev/null | cut -d' ' -f3 || echo "unknown")
-    log "go" "installed, version: ${current_version}"
+    log info "go" "installed, version: ${current_version}"
   else
-    log "go" "not installed"
+    log info "go" "not installed"
   fi
 }
 

@@ -8,18 +8,18 @@ CARGO_HOME="${CARGO_HOME:-${XDG_DATA_HOME}/cargo}"
 
 # Use devlog for consistent logging
 log() {
-  "$(dirname "$0")/../bin/devlog" log "$@"
+  "$(dirname "$0")/../bin/devlog" "$@"
 }
 
 install() {
   # Check if rustup is already installed
   if command -v rustup >/dev/null 2>&1; then
-    log "rust" "already installed, skipping"
+    log info "rust" "already installed, skipping"
     status
     return 0
   fi
 
-  log "rust" "installing rustup to ${RUSTUP_HOME}"
+  log info "rust" "installing rustup to ${RUSTUP_HOME}"
 
   # Install rustup via the official script
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile default --default-toolchain stable --component rust-analyzer --component rust-src
@@ -27,11 +27,11 @@ install() {
 
 update() {
   if ! command -v rustup >/dev/null 2>&1; then
-    log "rust" "not installed"
+    log info "rust" "not installed"
     return 1
   fi
 
-  log "rust" "updating rustup and toolchains"
+  log info "rust" "updating rustup and toolchains"
   rustup update
 }
 
@@ -39,7 +39,7 @@ uninstall() {
   if command -v rustup >/dev/null 2>&1; then
     rustup self uninstall
   else
-    log "rust" "already uninstalled"
+    log info "rust" "already uninstalled"
   fi
 }
 
@@ -47,9 +47,9 @@ status() {
   if command -v rustup >/dev/null 2>&1; then
     local current_version
     current_version=$(rustup show active-toolchain 2>/dev/null | cut -d' ' -f1 || echo "none")
-    log "rust" "rustup installed, current: ${current_version}"
+    log info "rust" "rustup installed, current: ${current_version}"
   else
-    log "rust" "not installed"
+    log info "rust" "not installed"
   fi
 }
 

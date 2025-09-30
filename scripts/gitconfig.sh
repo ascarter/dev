@@ -17,7 +17,7 @@ GIT_CONFIG_FILE="${HOME}/.gitconfig"
 
 # Use devlog for consistent logging
 log() {
-  "$(dirname "$0")/../bin/devlog" log "$@"
+  "$(dirname "$0")/../bin/devlog" "$@"
 }
 
 # Configure user identity
@@ -44,13 +44,13 @@ configure_user() {
 
   # Require GitHub CLI to be logged in
   if ! command -v gh >/dev/null 2>&1; then
-    log "error" "GitHub CLI (gh) is not installed"
+    log error "GitHub CLI (gh) is not installed"
     exit 1
   fi
 
   ghuser=$(gh api user --jq '.login' 2>/dev/null || true)
   if [ -z "$ghuser" ]; then
-    log "error" "Not logged into GitHub CLI. Run 'gh auth login' first."
+    log error "Not logged into GitHub CLI. Run 'gh auth login' first."
     exit 1
   fi
 
@@ -59,7 +59,7 @@ configure_user() {
   git config --global user.name "$fullname"
   git config --global user.email "$email"
 
-  log "user" "$fullname <$email>"
+  log info "user" "$fullname <$email>"
 }
 
 # Configure git credential managers
@@ -69,13 +69,13 @@ configure_credentials() {
 
   # Use GitHub CLI for GitHub authentication
   if command -v gh >/dev/null 2>&1; then
-    log "credentials" "gh (GitHub)"
+    log info "credentials" "gh (GitHub)"
     gh auth setup-git
   fi
 
   # Configure Azure DevOps if GCM is installed
   if command -v git-credential-manager >/dev/null 2>&1; then
-    log "credentials" "GCM (Azure DevOps)"
+    log info "credentials" "GCM (Azure DevOps)"
 
     az_urls="https://dev.azure.com https://*.visualstudio.com"
     for url in $az_urls; do
@@ -104,7 +104,7 @@ configure_signing() {
 
   # Check if GPG is installed and configured
   if ! command -v gpg >/dev/null 2>&1; then
-    log "signing" "GPG not installed - skipping"
+    log info "signing" "GPG not installed - skipping"
     return
   fi
 
@@ -116,13 +116,13 @@ configure_signing() {
   signing_key=$(gpg --list-secret-keys --with-colons 2>/dev/null | awk -F: '/^ssb/ && $12 ~ /s/ {print $5; exit}' || true)
 
   if [ -n "$signing_key" ]; then
-    log "signing" "YubiKey GPG key: $signing_key"
+    log info "signing" "YubiKey GPG key: $signing_key"
     git config --global user.signingkey "$signing_key"
     git config --global gpg.program "$gpg_path"
     git config --global commit.gpgsign true
     git config --global tag.gpgsign true
   else
-    log "signing" "No YubiKey GPG key found - skipping"
+    log info "signing" "No YubiKey GPG key found - skipping"
   fi
 }
 
@@ -133,7 +133,7 @@ configure_tools() {
 
   # Use opendiff on macOS for gui diff/merge tools
   if command -v opendiff >/dev/null 2>&1; then
-    log "gui tools" "opendiff"
+    log info "gui tools" "opendiff"
     git config --global diff.tool "opendiff"
     git config --global diff.guitool "opendiff"
     git config --global merge.tool "opendiff"
@@ -144,13 +144,13 @@ configure_tools() {
 # Configure Git LFS
 configure_lfs() {
   if command -v git-lfs >/dev/null 2>&1; then
-    log "lfs" "installed"
+    log info "lfs" "installed"
     git lfs install
   fi
 }
 
 # Main
-log "gitconfig" "Generating ${GIT_CONFIG_FILE}"
+log info "gitconfig" "Generating ${GIT_CONFIG_FILE}"
 log ""
 
 configure_user
@@ -160,4 +160,4 @@ configure_tools
 configure_lfs
 
 log ""
-log "gitconfig" "Configuration complete"
+log info "gitconfig" "Configuration complete"

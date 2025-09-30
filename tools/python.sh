@@ -10,18 +10,18 @@ UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-${UV_HOME}/bin}"
 
 # Use devlog for consistent logging
 log() {
-  "$(dirname "$0")/../bin/devlog" log "$@"
+  "$(dirname "$0")/../bin/devlog" "$@"
 }
 
 install() {
   # Check if uv is already installed
   if command -v uv >/dev/null 2>&1; then
-    log "python" "uv already installed, skipping"
+    log info "python" "uv already installed, skipping"
     status
     return 0
   fi
 
-  log "python" "installing uv"
+  log info "python" "installing uv"
 
   # Create our custom tool directories
   mkdir -p "${UV_TOOL_DIR}" "${UV_TOOL_BIN_DIR}"
@@ -29,22 +29,22 @@ install() {
   # Install uv via the official script with no path modification
   curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh
 
-  log "python" "uv installed successfully"
+  log info "python" "uv installed successfully"
 }
 
 update() {
   if ! command -v uv >/dev/null 2>&1; then
-    log "python" "uv not installed"
+    log info "python" "uv not installed"
     return 1
   fi
 
-  log "python" "updating uv"
+  log info "python" "updating uv"
   uv self update
 }
 
 uninstall() {
   if command -v uv >/dev/null 2>&1 || [ -d "${UV_HOME}" ]; then
-    log "python" "removing uv installation"
+    log info "python" "removing uv installation"
 
     # Remove uv binaries from .local/bin
     if [ -f "${XDG_BIN_HOME}/uv" ]; then
@@ -56,7 +56,7 @@ uninstall() {
       rm -rf "${UV_HOME}"
     fi
   else
-    log "python" "uv already uninstalled"
+    log info "python" "uv already uninstalled"
   fi
 }
 
@@ -64,9 +64,9 @@ status() {
   if command -v uv >/dev/null 2>&1; then
     local current_version
     current_version=$(uv --version 2>/dev/null | cut -d' ' -f2 || echo "unknown")
-    log "python" "uv installed, version: ${current_version}"
+    log info "python" "uv installed, version: ${current_version}"
   else
-    log "python" "uv not installed"
+    log info "python" "uv not installed"
   fi
 }
 
