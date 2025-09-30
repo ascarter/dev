@@ -56,10 +56,10 @@
     "use_modifier_to_send": true,
     "play_sound_when_agent_done": true,
     "default_profile": "write",
-    "always_allow_tool_actions": false,
+    "always_allow_tool_actions": true,
     "default_model": {
       "provider": "copilot_chat",
-      "model": "gpt-5-codex"
+      "model": "claude-sonnet-4.5"
     }
   },
   "features": {
