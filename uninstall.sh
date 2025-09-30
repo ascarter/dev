@@ -10,6 +10,17 @@ DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
 DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
 TARGET=${TARGET:-$HOME}
 
+# Use devlog for consistent logging
+log() {
+  if [ -x "${DEV_HOME}/bin/devlog" ]; then
+    "${DEV_HOME}/bin/devlog" "$@"
+  else
+    # Fallback to echo if devlog not available
+    shift # Remove level
+    echo "$@"
+  fi
+}
+
 usage() {
   echo "Usage: $0 [options]"
   echo
@@ -40,15 +51,15 @@ remove_path() {
     read answer
     case "$answer" in
     [Yy]*)
-      echo "Remove $path"
+      log info "uninstall" "Remove $path"
       rm -rf "$path"
       ;;
     *)
-      echo "Skip $path"
+      log info "uninstall" "Skip $path"
       ;;
     esac
   else
-    echo "Missing $path"
+    log info "uninstall" "Missing $path"
   fi
 }
 
@@ -58,7 +69,7 @@ ${DEV_HOME}/bin/dev ${FLAGS} -d ${DEV_HOME} -t ${TARGET} config unlink
 # Remove bootstrap from .zshenv
 ZSHENV="${TARGET}/.zshenv"
 if [ -f "$ZSHENV" ]; then
-  echo "Remove dev bootstrap from $ZSHENV"
+  log info "uninstall" "Remove dev bootstrap from $ZSHENV"
   sed -i.bak '/# dev - Development environment management/d' "$ZSHENV"
   sed -i.bak '/eval.*dev env/d' "$ZSHENV"
   rm -f "${ZSHENV}.bak"
@@ -67,5 +78,6 @@ fi
 remove_path "${DEV_CONFIG}"
 remove_path "${DEV_HOME}"
 
-echo "dev uninstalled"
-echo "Reload session to apply configuration"
+log ""
+log info "uninstall" "dev uninstalled"
+log info "uninstall" "Reload session to apply configuration"

@@ -4,9 +4,14 @@
 
 set -eu
 
+# Use devlog for consistent logging
+log() {
+  "$(dirname "$0")/../bin/devlog" "$@"
+}
+
 # Verify Linux
 if [ "$(uname -s)" != "Linux" ]; then
-  echo "Ubuntu/Debian only" >&2
+  log error "Ubuntu/Debian only"
   exit 1
 fi
 
@@ -18,24 +23,24 @@ fi
 case "${ID}" in
 debian | ubuntu) ;;
 *)
-  echo "Ubuntu/Debian only" >&2
+  log error "Ubuntu/Debian only"
   exit 1
   ;;
 esac
 
-echo "==> Provisioning $ID host"
+log info "$ID" "Provisioning $ID host"
 
-echo "Updating package lists..."
+log info "apt" "Updating package lists..."
 sudo apt-get update
 
-echo "Installing base packages..."
+log info "apt" "Installing base packages..."
 sudo apt-get install -y curl git gpg zsh build-essential
 
-echo "Upgrading packages..."
+log info "apt" "Upgrading packages..."
 sudo apt-get upgrade -y
 
-echo "Removing unused packages..."
+log info "apt" "Removing unused packages..."
 sudo apt-get autoremove -y
 
-echo ""
-echo "$ID host provisioning complete"
+log ""
+log info "$ID" "Provisioning complete"

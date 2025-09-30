@@ -4,6 +4,11 @@
 
 set -eu
 
+# Use devlog for consistent logging
+log() {
+  "$(dirname "$0")/../bin/devlog" "$@"
+}
+
 case $(uname -s) in
 Darwin)
   # Use homebrew to install Steam
@@ -11,7 +16,7 @@ Darwin)
     brew install --adopt --cask steam
     softwareupdate --install-rosetta --agree-to-license
   else
-    echo "Homebrew is not installed. Please install Homebrew first."
+    log error "Homebrew is not installed. Please install Homebrew first."
     exit 1
   fi
   ;;
@@ -39,7 +44,7 @@ Linux)
 
   # Install Steam flatpak
   if ! command -v flatpak >/dev/null 2>&1; then
-    echo "Flatpak is not installed. Please install Flatpak before running this script."
+    log error "Flatpak is not installed. Please install Flatpak before running this script."
     exit 1
   fi
 
@@ -47,4 +52,3 @@ Linux)
   flatpak install -y flathub com.valvesoftware.Steam
   ;;
 esac
-

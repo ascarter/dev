@@ -4,28 +4,33 @@
 
 set -eu
 
+# Use devlog for consistent logging
+log() {
+  "$(dirname "$0")/../bin/devlog" "$@"
+}
+
 # Verify macOS
 if [ "$(uname -s)" != "Darwin" ]; then
-  echo "macOS only" >&2
+  log error "macOS only"
   exit 1
 fi
 
-echo "==> Provisioning macOS host"
+log info "macos" "Provisioning macOS host"
 
 # Xcode command line tools
 if ! [ -e /Library/Developer/CommandLineTools ]; then
-  echo "Installing Xcode command line tools..."
+  log info "xcode" "Installing command line tools..."
   xcode-select --install
   read -p "Press [Enter] when installation completes..." -n1 -s
   echo
   sudo xcodebuild -runFirstLaunch
 else
-  echo "Xcode command line tools: OK"
+  log info "xcode" "Command line tools: OK"
 fi
 
 # Homebrew
 if ! command -v brew >/dev/null 2>&1; then
-  echo "Installing Homebrew..."
+  log info "homebrew" "Installing Homebrew..."
   # Use dev tool to install homebrew if dev command is available
   if command -v dev >/dev/null 2>&1; then
     dev tool homebrew install
@@ -39,36 +44,36 @@ if ! command -v brew >/dev/null 2>&1; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
 else
-  echo "Homebrew: OK"
+  log info "homebrew" "Homebrew: OK"
 fi
 
 # Update and install Brewfile packages
 if command -v brew >/dev/null 2>&1; then
-  echo "Updating Homebrew..."
+  log info "homebrew" "Updating Homebrew..."
   brew update
 
-  echo "Checking Brewfile..."
+  log info "brewfile" "Checking Brewfile..."
   if ! brew bundle check --global; then
-    echo "Installing/updating Brewfile packages..."
+    log info "brewfile" "Installing/updating packages..."
     brew bundle install --global
   else
-    echo "Brewfile: OK"
+    log info "brewfile" "Brewfile: OK"
   fi
 
-  echo "Upgrading packages..."
+  log info "homebrew" "Upgrading packages..."
   brew upgrade
 
-  echo "Cleaning up..."
+  log info "homebrew" "Cleaning up..."
   brew cleanup
 fi
 
 # Enable developer mode
-echo "Enabling developer mode..."
+log info "security" "Enabling developer mode..."
 spctl developer-mode enable-terminal 2>/dev/null || true
 
 # Terminal preferences
-echo "Setting Terminal preferences..."
+log info "terminal" "Setting Terminal preferences..."
 defaults write com.apple.terminal FocusFollowsMouse -string true
 
-echo ""
-echo "macOS host provisioning complete"
+log ""
+log info "macos" "Provisioning complete"

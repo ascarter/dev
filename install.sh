@@ -14,6 +14,17 @@ DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
 DEV_BRANCH=${DEV_BRANCH:-main}
 TARGET=${TARGET:-$HOME}
 
+# Use devlog for consistent logging (use installed version if available, otherwise fallback to echo)
+log() {
+  if [ -x "${DEV_HOME}/bin/devlog" ]; then
+    "${DEV_HOME}/bin/devlog" "$@"
+  else
+    # Fallback to echo if devlog not yet installed
+    shift # Remove level
+    echo "$@"
+  fi
+}
+
 usage() {
   echo "Usage: $0 [options]"
   echo
@@ -78,7 +89,7 @@ if ! command -v git >/dev/null 2>&1; then
     if prompt "Install Xcode command line tools?"; then
       xcode-select --install
     else
-      echo "Please install Xcode command line tools: xcode-select --install" >&2
+      log error "Please install Xcode command line tools: xcode-select --install"
       exit 1
     fi
     ;;
@@ -86,7 +97,7 @@ if ! command -v git >/dev/null 2>&1; then
     if prompt "Install git using dnf?"; then
       sudo dnf install -y git
     else
-      echo "Please install git using your package manager: sudo dnf install git" >&2
+      log error "Please install git using your package manager: sudo dnf install git"
       exit 1
     fi
     ;;
@@ -94,12 +105,12 @@ if ! command -v git >/dev/null 2>&1; then
     if prompt "Install git using apt?"; then
       sudo apt install -y git
     else
-      echo "Please install git using your package manager: sudo apt install git" >&2
+      log error "Please install git using your package manager: sudo apt install git"
       exit 1
     fi
     ;;
   *)
-    echo "Git is not installed. Please install git and try again." >&2
+    log error "Git is not installed. Please install git and try again."
     exit 1
     ;;
   esac
@@ -107,13 +118,13 @@ fi
 
 # Clone dev
 if [ ! -d "${DEV_HOME}" ]; then
-  echo "Clone dev ($DEV_BRANCH) -> ${DEV_HOME}"
+  log info "install" "Clone dev ($DEV_BRANCH) -> ${DEV_HOME}"
   mkdir -p $(dirname "${DEV_HOME}")
   git clone -b ${DEV_BRANCH} https://github.com/ascarter/dev.git ${DEV_HOME}
 else
-  echo "dev directory already exists at ${DEV_HOME}"
+  log info "install" "dev directory already exists at ${DEV_HOME}"
   if prompt "Update existing dev?"; then
-    echo "Updating dev..."
+    log info "install" "Updating dev..."
     git -C "${DEV_HOME}" pull
   fi
 fi
@@ -127,13 +138,13 @@ fi
 # Run appropriate host provisioning script
 HOST_SCRIPT="${DEV_HOME}/hosts/${PLATFORM_ID}.sh"
 if [ -f "${HOST_SCRIPT}" ]; then
-  if prompt "Run ${HOST_ID} host provisioning script?"; then
+  if prompt "Run ${PLATFORM_ID} host provisioning script?"; then
     "${HOST_SCRIPT}"
   fi
 else
-  echo "No host provisioning script found for ${PLATFORM_ID}"
+  log warn "install" "No host provisioning script found for ${PLATFORM_ID}"
 fi
 
-echo ""
-echo "dev installation complete"
-echo "Reload your session to apply configuration"
+log ""
+log info "install" "dev installation complete"
+log info "install" "Reload your session to apply configuration"

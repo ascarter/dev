@@ -4,9 +4,14 @@
 
 set -eu
 
+# Use devlog for consistent logging
+log() {
+  "$(dirname "$0")/../bin/devlog" "$@"
+}
+
 # Verify Linux
 if [ "$(uname -s)" != "Linux" ]; then
-  echo "Fedora Linux only" >&2
+  log error "Fedora Linux only"
   exit 1
 fi
 
@@ -15,45 +20,45 @@ if [ -f /etc/os-release ]; then
 fi
 
 if [ "$ID" != "fedora" ]; then
-  echo "Fedora Linux only" >&2
+  log error "Fedora Linux only"
   exit 1
 fi
 
-echo "==> Provisioning Fedora host ($VARIANT_ID)"
+log info "fedora" "Provisioning Fedora host ($VARIANT_ID)"
 
 # Update firmware
 if command -v fwupdmgr >/dev/null 2>&1; then
-  echo "Updating firmware..."
+  log info "firmware" "Updating firmware..."
   sudo fwupdmgr refresh --force
   sudo fwupdmgr update
 fi
 
 case "$VARIANT_ID" in
 silverblue | cosmic-atomic)
-  echo "Fedora Atomic variant detected"
+  log info "atomic" "Fedora Atomic variant detected"
 
   # Update rpm-ostree
-  echo "Updating rpm-ostree..."
+  log info "rpm-ostree" "Updating rpm-ostree..."
   rpm-ostree upgrade
 
   # Install rpm overlays
   case "${XDG_CURRENT_DESKTOP:-}" in
   COSMIC)
-    echo "COSMIC desktop detected"
+    log info "desktop" "COSMIC desktop detected"
     # Add cosmic specific overlays here if needed
     ;;
   GNOME)
-    echo "GNOME desktop detected"
-    echo "Installing GNOME tweaks..."
+    log info "desktop" "GNOME desktop detected"
+    log info "gnome" "Installing GNOME tweaks..."
     rpm-ostree install --idempotent gnome-tweaks
-    echo "Configuring GNOME settings..."
+    log info "gnome" "Configuring GNOME settings..."
     gsettings set org.gnome.desktop.wm.preferences button-layout appmenu:minimize,close
     ;;
   esac
 
   # Update flatpaks
   if command -v flatpak >/dev/null 2>&1; then
-    echo "Updating Flatpaks..."
+    log info "flatpak" "Updating Flatpaks..."
     if command -v dev >/dev/null 2>&1; then
       dev tool flatpak update
     else
@@ -63,30 +68,30 @@ silverblue | cosmic-atomic)
   ;;
 
 server)
-  echo "Fedora Server detected"
-  echo "Installing base packages..."
+  log info "fedora" "Fedora Server detected"
+  log info "dnf" "Installing base packages..."
   sudo dnf install -y dnf-plugins-core curl git
-  echo "Updating packages..."
+  log info "dnf" "Updating packages..."
   sudo dnf upgrade -y
   ;;
 
 workstation | wsl)
-  echo "Fedora Workstation/WSL detected"
-  echo "Installing base packages..."
+  log info "fedora" "Fedora Workstation/WSL detected"
+  log info "dnf" "Installing base packages..."
   sudo dnf install -y dnf-plugins-core @development-tools curl git zsh
-  echo "Updating packages..."
+  log info "dnf" "Updating packages..."
   sudo dnf upgrade -y
   ;;
 
 *)
-  echo "Fedora $VARIANT_ID not fully supported" >&2
-  echo "Installing base packages..."
+  log warn "fedora" "Fedora $VARIANT_ID not fully supported"
+  log info "dnf" "Installing base packages..."
   sudo dnf install -y curl git
-  echo "Updating packages..."
+  log info "dnf" "Updating packages..."
   sudo dnf upgrade -y
   ;;
 esac
 
-echo ""
-echo "Fedora host provisioning complete"
-echo "Run 'systemctl reboot' to restart if needed"
+log ""
+log info "fedora" "Provisioning complete"
+log info "fedora" "Run 'systemctl reboot' to restart if needed"
