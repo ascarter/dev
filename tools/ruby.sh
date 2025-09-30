@@ -6,12 +6,9 @@ XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
 RBENV_ROOT="${RBENV_ROOT:-${XDG_DATA_HOME}/rbenv}"
 RUBY_CONFIGURE_OPTS="--enable-yjit"
 
+# Use devlog for consistent logging
 log() {
-  if [ "$#" -eq 1 ]; then
-    printf "%s\n" "$1"
-  elif [ "$#" -gt 1 ]; then
-    printf "$(tput bold)%-10s$(tput sgr0)\t%s\n" "$1" "$2"
-  fi
+  "$(dirname "$0")/../bin/devlog" log "$@"
 }
 
 latest() {

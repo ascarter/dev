@@ -6,12 +6,9 @@ XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
 XDG_BIN_HOME=${XDG_BIN_HOME:-${XDG_DATA_HOME}/../bin}
 GOROOT="${GOROOT:-${XDG_DATA_HOME}/go}"
 
+# Use devlog for consistent logging
 log() {
-  if [ "$#" -eq 1 ]; then
-    printf "%s\n" "$1"
-  elif [ "$#" -gt 1 ]; then
-    printf "$(tput bold)%-10s$(tput sgr0)\t%s\n" "$1" "$2"
-  fi
+  "$(dirname "$0")/../bin/devlog" log "$@"
 }
 
 install() {
