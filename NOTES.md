@@ -370,3 +370,88 @@ Manages configuration file symlinks from `config/` to `$XDG_CONFIG_HOME`.
 - `*_sync` or similar for helper functions
 - Subcommand usage shows full command path (e.g., "dev config")
 - Error messages follow pattern: "command: error message"
+---
+
+## ZSH Shell Integration Analysis
+
+### ZDOTDIR Research
+
+**What is ZDOTDIR?**
+- Environment variable that tells zsh where to find startup files
+- Default: `$HOME` (looks for ~/.zshrc, ~/.zshenv, etc.)
+- When set: zsh looks for startup files in `$ZDOTDIR` instead
+- Exception: `~/.zshenv` is ALWAYS sourced first (before ZDOTDIR is evaluated)
+
+**ZSH Startup File Order:**
+1. `~/.zshenv` - Always sourced (can't be moved with ZDOTDIR)
+2. `$ZDOTDIR/.zprofile` - Login shells
+3. `$ZDOTDIR/.zshrc` - Interactive shells
+4. `$ZDOTDIR/.zlogin` - Login shells (after zshrc)
+5. `$ZDOTDIR/.zlogout` - Login shells on exit
+
+### Option Analysis
+
+**Option 1: ZDOTDIR in $TARGET/.config/zsh (symlink approach)**
+```
+config/zsh/.zshrc        → symlinked to → $TARGET/.config/zsh/.zshrc
+~/.zshenv sets ZDOTDIR=$XDG_CONFIG_HOME/zsh
+```
+Pros:
+- XDG compliant
+- Consistent with other config/ files (managed via `dev config`)
+- Clean separation of dev-managed vs user-managed
+- Easy to version control
+
+Cons:
+- Requires ~/.zshenv to set ZDOTDIR (bootstrap file in $HOME)
+- One extra level of indirection
+
+**Option 2: Direct ZDOTDIR to $DEV_HOME/etc (no symlinks)**
+```
+$DEV_HOME/etc/zshrc      → ZDOTDIR=$DEV_HOME/etc
+~/.zshenv sets ZDOTDIR=$DEV_HOME/etc
+```
+Pros:
+- Direct access (no symlinks)
+- Matches dotfiles pattern
+- Could include profile.d modular structure
+
+Cons:
+- Not XDG compliant
+- Breaks pattern of config/ being the single source of config files
+- Mixing shell config with potential shell profiles/utilities
+
+### Recommendation: Option 1 (ZDOTDIR in config/zsh)
+
+**Rationale:**
+1. **XDG Compliance** - Keeps everything under `$XDG_CONFIG_HOME`
+2. **Consistency** - All managed configs go through `dev config link`
+3. **Clean Separation** - Clear boundary between dev-managed and user files
+4. **Standard Practice** - This is the modern zsh convention
+5. **Flexibility** - Users can add their own files to `~/.config/zsh/` that won't be managed
+
+**Implementation:**
+```
+Structure:
+  config/zsh/.zshenv      # Minimal - just sets ZDOTDIR
+  config/zsh/.zshrc       # Main interactive shell config
+  config/zsh/.zprofile    # Login shell config (optional)
+  config/zsh/functions/   # Custom functions (optional)
+
+Bootstrap:
+  ~/.zshenv -> symlinked to -> $XDG_CONFIG_HOME/zsh/.zshenv
+
+Flow:
+  1. zsh starts, sources ~/.zshenv (ALWAYS)
+  2. ~/.zshenv sets ZDOTDIR=$XDG_CONFIG_HOME/zsh
+  3. zsh then sources $ZDOTDIR/.zshrc (for interactive shells)
+```
+
+**What `dev init` needs to do:**
+1. Create config/zsh/.zshenv with minimal bootstrap:
+   ```zsh
+   export ZDOTDIR=${ZDOTDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/zsh}
+   ```
+2. Symlink ~/.zshenv -> $XDG_CONFIG_HOME/zsh/.zshenv
+3. Add `eval "$(dev env)"` to config/zsh/.zshrc
+4. Run `dev config link` to link all config files

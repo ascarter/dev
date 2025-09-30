@@ -18,5 +18,3 @@ set keymap vi-insert
 
 # Kill‐word
 "\C-w": backward-kill-word     # ^W → backward‐kill‐word
-
-# vim: set ft=sh ts=2 sw=2 et:

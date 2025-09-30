@@ -62,5 +62,3 @@ if OS.mac?
 elsif OS.linux?
   # ...
 end
-
-# vim: set ft=rb ts=2 sw=2 et:

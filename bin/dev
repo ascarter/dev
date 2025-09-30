@@ -193,12 +193,28 @@ cmd_env() {
   printf 'export XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}\n'
   printf 'export DEV_HOME=${DEV_HOME:-$XDG_DATA_HOME/dev}\n'
   printf 'export DEV_CONFIG=${DEV_CONFIG:-$XDG_CONFIG_HOME/dev}\n'
+  printf 'export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}\n'
   printf 'export PATH=${XDG_BIN_HOME}:${DEV_HOME}/bin:$PATH\n'
 }
 
 cmd_init() {
-  log "init" "Initialize dev for zsh"
-  # TODO: Implement zsh initialization
+  zshenv="${TARGET}/.zshenv"
+  bootstrap_line="eval \"\$(${DEV_HOME}/bin/dev env)\""
+
+  # Check if already initialized
+  if [ -f "$zshenv" ] && grep -qF "$bootstrap_line" "$zshenv"; then
+    log "init" "Already initialized in $zshenv"
+    return 0
+  fi
+
+  # Add leading newline if file exists
+  [ -f "$zshenv" ] && printf "\n" >> "$zshenv"
+
+  # Append bootstrap
+  printf "# dev - Development environment management\n%s\n" "$bootstrap_line" >> "$zshenv"
+
+  log "init" "Initialized dev for zsh"
+  log "" "Restart your shell or run: source ~/.zshenv"
 }
 
 config_usage() {
