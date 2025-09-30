@@ -10,65 +10,56 @@ if [ "$(uname -s)" != "Darwin" ]; then
   exit 1
 fi
 
-ACTION="${1:-provision}"
+echo "==> Provisioning macOS host"
 
-case "$ACTION" in
-provision)
-  echo "==> Provisioning macOS host"
+# Xcode command line tools
+if ! [ -e /Library/Developer/CommandLineTools ]; then
+  echo "Installing Xcode command line tools..."
+  xcode-select --install
+  read -p "Press [Enter] when installation completes..." -n1 -s
+  echo
+  sudo xcodebuild -runFirstLaunch
+else
+  echo "Xcode command line tools: OK"
+fi
 
-  # Xcode command line tools
-  if ! [ -e /Library/Developer/CommandLineTools ]; then
-    echo "Installing Xcode command line tools..."
-    xcode-select --install
-    read -p "Press [Enter] when installation completes..." -n1 -s
-    echo
-    sudo xcodebuild -runFirstLaunch
+# Homebrew
+HOMEBREW_PREFIX="/opt/homebrew"
+if ! [ -d "${HOMEBREW_PREFIX}" ]; then
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
+else
+  echo "Homebrew: OK"
+fi
+
+# Update and install Brewfile packages
+if command -v brew >/dev/null 2>&1; then
+  echo "Updating Homebrew..."
+  brew update
+
+  echo "Checking Brewfile..."
+  if ! brew bundle check --global; then
+    echo "Installing/updating Brewfile packages..."
+    brew bundle install --global
   else
-    echo "Xcode command line tools already installed"
+    echo "Brewfile: OK"
   fi
 
-  # Homebrew
-  HOMEBREW_PREFIX="/opt/homebrew"
-  if ! [ -d "${HOMEBREW_PREFIX}" ]; then
-    echo "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
-  else
-    echo "Homebrew already installed"
-  fi
+  echo "Upgrading packages..."
+  brew upgrade
 
-  # Install Brewfile packages
-  if command -v brew >/dev/null 2>&1; then
-    echo "Installing Homebrew packages..."
-    brew bundle check --global || brew bundle install --global
-  fi
+  echo "Cleaning up..."
+  brew cleanup
+fi
 
-  # Enable developer mode
-  echo "Enabling developer mode..."
-  spctl developer-mode enable-terminal 2>/dev/null || true
+# Enable developer mode
+echo "Enabling developer mode..."
+spctl developer-mode enable-terminal 2>/dev/null || true
 
-  # Terminal preferences
-  echo "Setting Terminal preferences..."
-  defaults write com.apple.terminal FocusFollowsMouse -string true
+# Terminal preferences
+echo "Setting Terminal preferences..."
+defaults write com.apple.terminal FocusFollowsMouse -string true
 
-  echo "macOS host provisioning complete"
-  ;;
-
-update)
-  echo "==> Updating macOS host"
-  
-  if command -v brew >/dev/null 2>&1; then
-    echo "Updating Homebrew..."
-    brew update
-    brew upgrade
-    brew cleanup
-  fi
-
-  echo "macOS host update complete"
-  ;;
-
-*)
-  echo "Usage: $0 [provision|update]" >&2
-  exit 1
-  ;;
-esac
+echo ""
+echo "macOS host provisioning complete"

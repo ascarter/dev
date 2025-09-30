@@ -107,6 +107,7 @@ User-specific configurations can be placed in `$XDG_CONFIG_HOME/dev/` to overrid
 - Use XDG environment variables
 - NEVER hardcode anything that could be a secret or identifiable (like names or logins)
 - Use .editorconfig settings instead of modelines in the files
+- Do not create git commits unless instructed to do so
 
 ## Hosts and Tools System
 

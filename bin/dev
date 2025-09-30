@@ -57,7 +57,7 @@ usage() {
   log "  update" "Update dev from git and re-link"
   log "  edit" "Edit dev repository in \$EDITOR"
   log "  config <action>" "Manage configuration files (status|link|unlink)"
-  log "  host [action]" "Manage host provisioning (provision|update)"
+  log "  host" "Provision and update host system"
   log "  tool [name] [action]" "Manage tool installation"
   log ""
   usage_options
@@ -294,13 +294,12 @@ get_platform_id() {
 }
 
 host_usage() {
-  log "dev host" "Manage host provisioning"
+  log "dev host" "Provision and update host system"
   log ""
-  log "Usage:" "dev [options] host [action]"
+  log "Usage:" "dev [options] host"
   log ""
-  log "Actions:" ""
-  log "  provision" "Provision host system (default)"
-  log "  update" "Update host system packages"
+  log "Runs idempotent provisioning for the current platform."
+  log "Installs missing packages and updates existing ones."
   log ""
   log "Platform is auto-detected from the system"
   log ""
@@ -308,10 +307,8 @@ host_usage() {
 }
 
 cmd_host() {
-  action="${1:-provision}"
-
   # Check for help
-  case "${action}" in
+  case "${1:-}" in
   -h | --help)
     host_usage
     return 0
@@ -332,8 +329,8 @@ cmd_host() {
     exit 1
   fi
 
-  log "host" "Running ${platform} ${action}"
-  "${host_script}" "${action}"
+  log "host" "Running ${platform} provisioning"
+  "${host_script}"
 }
 
 cmd_tool() {
