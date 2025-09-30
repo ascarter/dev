@@ -77,12 +77,14 @@ dev tool [name] [action]
 
 ## Key Environment Variables
 
-- `DEV_HOME` - Location of dev repository (default: `$XDG_DATA_HOME/dev`)
+- `DEV_HOME` - Location of dev repository (default: `$HOME/.local/share/dev`, can be overridden with `-d`)
 - `DEV_CONFIG` - User config override directory (default: `$XDG_CONFIG_HOME/dev`)
-- `DEV_BIN` - Dev bin directory (computed: `$DEV_HOME/bin`)
-- `DEV_HOSTS` - Hosts directory (computed: `$DEV_HOME/hosts`)
-- `DEV_TOOLS` - Tools directory (computed: `$DEV_HOME/tools`)
-- `TARGET` - Target directory for symlinks (default: `$HOME`)
+- `TARGET` - Target directory for symlinks (default: `$HOME`, can be overridden with `-t`)
+- `XDG_CONFIG_HOME` - Derived from TARGET: `$TARGET/.config`
+- `XDG_DATA_HOME` - Derived from TARGET: `$TARGET/.local/share`
+- `XDG_BIN_HOME` - Derived from TARGET: `$TARGET/.local/bin`
+
+**Note:** When `-t` is specified, all XDG paths are derived from TARGET to ensure consistency. This allows safe testing without affecting your home directory.
 
 ## Configuration Override
 
@@ -108,11 +110,45 @@ User-specific configurations can be placed in `$XDG_CONFIG_HOME/dev/` to overrid
 
 ## Hosts and Tools System
 
-The `hosts/` directory contains platform-specific provisioning scripts for macOS, Fedora, and Ubuntu. These scripts set up the base environment for each platform.
+The `hosts/` directory will contain platform-specific provisioning scripts for macOS, Fedora, and Ubuntu. These scripts set up the base environment for each platform. *(Not yet implemented)*
 
-The `tools/` directory contains idempotent provisioning scripts for:
+The `tools/` directory will contain idempotent provisioning scripts for:
 - Development tools
 - Languages and frameworks
 - Applications
 
-All scripts can be run independently and repeatedly without issues.
+All scripts can be run independently and repeatedly without issues. *(Not yet implemented)*
+
+## Implementation Status
+
+**Completed:**
+- ✅ `bin/dev` - Main command with full option parsing and help
+- ✅ `dev env` - Environment export for shell integration
+- ✅ `dev config` - Complete symlink management (status/link/unlink)
+- ✅ `config/` - All configuration files ported from dotfiles
+
+**To Do:**
+- ⏳ `dev init` - Shell initialization (zsh)
+- ⏳ `dev update` - Git update and re-link
+- ⏳ `dev edit` - Open repository in editor
+- ⏳ `dev host` - Platform provisioning
+- ⏳ `dev tool` - Tool installation management
+- ⏳ `install.sh` and `uninstall.sh` - Bootstrap scripts
+
+## Code Patterns
+
+**Function Naming:**
+- `cmd_*` - Command handlers (e.g., `cmd_config`, `cmd_env`)
+- `*_usage` - Usage/help functions (e.g., `config_usage`, `usage_options`)
+- `*_sync` or descriptive names - Helper functions (e.g., `config_sync`, `setup_environment`)
+
+**Error Handling:**
+- Invalid commands: Show error then usage
+- Invalid subcommand actions: Show error then subcommand usage
+- Pattern: "command: error message"
+
+**Usage Display:**
+- Shows expanded path values, not just variable names
+- Subcommands show full command path (e.g., "dev config")
+- Reusable `usage_options()` for DRY
+- Options show actual current values (respects `-d` and `-t` overrides)

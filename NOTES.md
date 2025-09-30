@@ -339,17 +339,34 @@ Manages configuration file symlinks from `config/` to `$XDG_CONFIG_HOME`.
 
 **Key Functions:**
 - `setup_environment()` - Sets XDG and DEV variables based on TARGET
-- `sync()` - Main sync engine (ported from dotfiles)
+- `config_sync()` - Main sync engine (renamed from sync() for clarity)
+- `config_usage()` - Usage display for config subcommand
 - `check_symlink()` - Validates symlink targets
-- `remove_empty_dir()` - Cleans up empty directories on unlink
+- `usage_options()` - Reusable options display (DRY)
+
+**Directory Cleanup:**
+- Iterative empty directory removal after unlink
+- Safely preserves directories containing user files
+- Handles cascading cleanup (parent dirs become empty after children removed)
+- Tested with mixed user/managed content
 
 **Testing:**
 - ✅ Status shows missing/ok/conflict/invalid links
 - ✅ Link creates all symlinks correctly
-- ✅ Unlink removes symlinks and empty directories
+- ✅ Unlink removes symlinks and all empty directories
+- ✅ Unlink preserves directories with user files
 - ✅ -t option works to test without affecting $HOME
 - ✅ Verbose mode shows all operations
 - ✅ Respects EXCLUDE_PATTERNS (.DS_Store, etc.)
+- ✅ Usage shows expanded path values
+- ✅ Invalid actions show error then usage
 
 **Config files ported:**
 - ghostty, git, helix, homebrew, irb, karabiner, nano, readline, ssh, vim, zed
+
+**Design Patterns Established:**
+- `cmd_*` prefix for command handlers
+- `*_usage` for usage functions
+- `*_sync` or similar for helper functions
+- Subcommand usage shows full command path (e.g., "dev config")
+- Error messages follow pattern: "command: error message"
