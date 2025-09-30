@@ -455,3 +455,97 @@ Flow:
 2. Symlink ~/.zshenv -> $XDG_CONFIG_HOME/zsh/.zshenv
 3. Add `eval "$(dev env)"` to config/zsh/.zshrc
 4. Run `dev config link` to link all config files
+
+---
+
+## ZSH Shell Integration - COMPLETED (2025-09-30)
+
+### Implementation
+
+**Decision:** Simplified approach - single line in ~/.zshenv that evaluates `dev env`
+
+**Structure:**
+```
+~/.zshenv                       # Bootstrap: eval "$(dev env)"
+config/zsh/.zshrc              # Main zsh config
+config/zsh/.zprofile           # Login shell config
+config/zsh/profile.d/*.sh      # Environment setup (homebrew, ssh)
+config/zsh/rc.d/*.sh           # Runtime config (aliases, prompt, language tools)
+```
+
+**Bootstrap Flow:**
+1. `~/.zshenv` runs: `eval "$(dev env)"`
+2. `dev env` exports all XDG variables, DEV_HOME, and **ZDOTDIR**
+3. zsh uses ZDOTDIR to find `.zshrc` in `$XDG_CONFIG_HOME/zsh/`
+4. `.zshrc` loads modules from `profile.d/` and `rc.d/`
+
+**Implementation Details:**
+- `dev env` exports `ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}`
+- `dev init` writes bootstrap line to `~/.zshenv` (idempotent)
+- Ported all zsh config from dotfiles
+- Removed all bash alternatives (zsh-only)
+- Removed all vim modelines (use .editorconfig)
+- Organized into profile.d (environment) and rc.d (runtime)
+
+**Testing:**
+- ✅ `dev init` creates/updates ~/.zshenv correctly
+- ✅ ZDOTDIR is set and zsh finds config
+- ✅ All rc.d modules load correctly
+- ✅ Prompt, aliases, completions all working
+
+---
+
+## Host Provisioning System - COMPLETED (2025-09-30)
+
+### Implementation
+
+**Approach:** Fully idempotent scripts - no separate provision/update actions
+
+**Command:**
+```bash
+dev host    # Auto-detects platform and runs provisioning
+```
+
+**Host Scripts:**
+- `hosts/macos.sh` - Xcode CLI tools, Homebrew, Brewfile, system settings
+- `hosts/fedora.sh` - Firmware updates, rpm-ostree/dnf, flatpak, GNOME/COSMIC settings
+- `hosts/ubuntu.sh` - apt packages, updates, cleanup
+
+**Design Decisions:**
+1. **Platform auto-detection only** - No manual platform override needed
+2. **Fully idempotent** - Check state, install missing, update existing in one run
+3. **No provision/update split** - Eliminated duplication
+4. **Consistent messaging** - Show "OK" for already-installed components
+
+**Benefits:**
+- Simple interface: just `dev host`
+- Scripts adapt to current system state
+- No redundant code paths
+- Single source of truth
+
+**Testing:**
+- ✅ macOS provisioning works (Xcode, Homebrew, Brewfile)
+- ✅ Auto-detection works correctly
+- ✅ Idempotent - safe to run multiple times
+- ✅ brew bundle check runs every time (fixes duplication issue)
+
+---
+
+## Installation Scripts - COMPLETED (2025-09-30)
+
+### Implementation
+
+**Scripts:**
+- `install.sh` - Clone repo, init shell, link configs, optionally run host provisioning
+- `uninstall.sh` - Unlink configs, clean up ~/.zshenv, remove directories
+
+**Features:**
+- Platform detection
+- Git dependency checking with auto-install prompts
+- Interactive prompts for host provisioning
+- Support for branch selection (-b)
+- Support for custom directories (-d, -t)
+
+**Testing:**
+- ✅ Scripts created and executable
+- ✅ Match patterns from dotfiles

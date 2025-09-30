@@ -68,8 +68,8 @@ dev config status      # Show status of all configuration files
 dev config link        # Link all configuration files
 dev config unlink      # Unlink all configuration files
 
-# Run host provisioning
-dev host [platform]
+# Run host provisioning (idempotent - installs and updates)
+dev host
 
 # Manage tools
 dev tool [name] [action]
@@ -111,30 +111,40 @@ User-specific configurations can be placed in `$XDG_CONFIG_HOME/dev/` to overrid
 
 ## Hosts and Tools System
 
-The `hosts/` directory will contain platform-specific provisioning scripts for macOS, Fedora, and Ubuntu. These scripts set up the base environment for each platform. *(Not yet implemented)*
+The `hosts/` directory contains platform-specific provisioning scripts for macOS, Fedora, and Ubuntu. These scripts are fully idempotent - they check current state, install what's missing, and update what exists. Each script can be run multiple times safely and will bring the system to the desired state.
+
+**Host Provisioning:**
+- `hosts/macos.sh` - macOS provisioning (Xcode, Homebrew, Brewfile, system settings)
+- `hosts/fedora.sh` - Fedora provisioning (firmware, rpm-ostree/dnf, flatpak, desktop settings)
+- `hosts/ubuntu.sh` - Ubuntu/Debian provisioning (apt packages, updates)
+
+All host scripts are idempotent - they install missing packages and update existing ones in a single run.
 
 The `tools/` directory will contain idempotent provisioning scripts for:
 - Development tools
 - Languages and frameworks
 - Applications
 
-All scripts can be run independently and repeatedly without issues. *(Not yet implemented)*
+All scripts can be run independently and repeatedly without issues. *(Tools not yet implemented)*
 
 ## Implementation Status
 
 **Completed:**
 - ✅ `bin/dev` - Main command with full option parsing and help
-- ✅ `dev env` - Environment export for shell integration
+- ✅ `dev env` - Environment export with ZDOTDIR for shell integration
+- ✅ `dev init` - Shell initialization (writes bootstrap to ~/.zshenv)
+- ✅ `dev edit` - Opens DEV_HOME in $EDITOR
 - ✅ `dev config` - Complete symlink management (status/link/unlink)
+- ✅ `dev host` - Idempotent platform provisioning (auto-detects platform)
 - ✅ `config/` - All configuration files ported from dotfiles
+- ✅ `config/zsh/` - ZSH configuration with rc.d modules
+- ✅ `hosts/` - Platform scripts (macos, fedora, ubuntu) - fully idempotent
+- ✅ `install.sh` and `uninstall.sh` - Bootstrap scripts
 
 **To Do:**
-- ⏳ `dev init` - Shell initialization (zsh)
 - ⏳ `dev update` - Git update and re-link
-- ⏳ `dev edit` - Open repository in editor
-- ⏳ `dev host` - Platform provisioning
 - ⏳ `dev tool` - Tool installation management
-- ⏳ `install.sh` and `uninstall.sh` - Bootstrap scripts
+- ⏳ `tools/` - Tool installation scripts
 
 ## Code Patterns
 
