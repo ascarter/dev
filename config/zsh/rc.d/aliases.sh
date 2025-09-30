@@ -3,10 +3,14 @@ if ! command -v zed >/dev/null 2>&1; then
   if command -v zed-preview >/dev/null 2>&1; then
     alias zed=zed-preview
   fi
+fi
+
+if command -v zed >/dev/null 2>&1; then
   alias devz="EDITOR=zed dev edit"
 fi
 
 alias devcd='cd ${DEV_HOME}'
+
 if [ -d ~/Developer ]; then
   alias devd='cd ~/Developer'
 fi

@@ -31,7 +31,7 @@ if OS.mac?
   cask "bbedit"
   cask "chatgpt"
   cask "claude"
-  cask "docker"
+  cask "docker-desktop"
   cask "ghostty"
   cask "github"
   cask "hhkb"
