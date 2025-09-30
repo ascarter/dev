@@ -4,10 +4,8 @@
 
 set -eu
 
-# Use devlog for consistent logging
-log() {
-  "$(dirname "$0")/../bin/devlog" "$@"
-}
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog.sh"
 
 install() {
   if ! command -v flatpak >/dev/null 2>&1; then

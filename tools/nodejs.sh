@@ -6,10 +6,8 @@ XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
 XDG_BIN_HOME=${XDG_BIN_HOME:-${XDG_DATA_HOME}/../bin}
 FNM_DIR="${FNM_DIR:-${XDG_DATA_HOME}/fnm}"
 
-# Use devlog for consistent logging
-log() {
-  "$(dirname "$0")/../bin/devlog" "$@"
-}
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog.sh"
 
 install() {
   # Check if fnm is already installed
@@ -20,50 +18,7 @@ install() {
   fi
 
   log info "nodejs" "installing fnm to ${FNM_DIR}"
-
-  # Detect OS
-  local os
-  case "$(uname -s)" in
-  Linux*) os="linux" ;;
-  Darwin*) os="macos" ;;
-  *)
-    log error "nodejs" "unsupported OS: $(uname -s)"
-    return 1
-    ;;
-  esac
-
-  # Check dependencies
-  if ! command -v curl >/dev/null 2>&1; then
-    log error "nodejs" "curl is required for installation"
-    return 1
-  fi
-
-  if ! command -v unzip >/dev/null 2>&1; then
-    log error "nodejs" "unzip is required for installation"
-    return 1
-  fi
-
-  # Get latest version
-  local version
-  version=$(curl -s https://api.github.com/repos/Schniz/fnm/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-  if [ -z "$version" ]; then
-    log error "nodejs" "failed to fetch latest fnm version"
-    return 1
-  fi
-
-  local filename="fnm-${os}.zip"
-  local url="https://github.com/Schniz/fnm/releases/download/${version}/${filename}"
-
-  log info "nodejs" "downloading and extracting fnm ${version}"
-  mkdir -p "${FNM_DIR}"
-  if ! curl -fsSL "$url" | unzip -q - -d "${FNM_DIR}"; then
-    log error "nodejs" "failed to download or extract fnm"
-    return 1
-  fi
-
-  chmod +x "${FNM_DIR}/fnm"
-
-  log info "nodejs" "fnm installed successfully"
+  curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell --install-dir "${FNM_DIR}" --force-install
 }
 
 update() {

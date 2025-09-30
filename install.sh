@@ -14,16 +14,25 @@ DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
 DEV_BRANCH=${DEV_BRANCH:-main}
 TARGET=${TARGET:-$HOME}
 
-# Use devlog for consistent logging (use installed version if available, otherwise fallback to echo)
-log() {
-  if [ -x "${DEV_HOME}/bin/devlog" ]; then
-    "${DEV_HOME}/bin/devlog" "$@"
-  else
-    # Fallback to echo if devlog not yet installed
-    shift # Remove level
+# Source devlog library for consistent logging (with fallback if not yet installed)
+if [ -f "${DEV_HOME}/bin/devlog.sh" ]; then
+  . "${DEV_HOME}/bin/devlog.sh"
+else
+  # Fallback log function if devlog not yet installed
+  log() {
+    if [ "$#" -eq 0 ]; then
+      printf "\n"
+      return 0
+    fi
+    # Strip level if present
+    case "$1" in
+    info | warn | error | debug)
+      shift
+      ;;
+    esac
     echo "$@"
-  fi
-}
+  }
+fi
 
 usage() {
   echo "Usage: $0 [options]"

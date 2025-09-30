@@ -4,10 +4,8 @@
 
 set -eu
 
-# Use devlog for consistent logging
-log() {
-  "$(dirname "$0")/../bin/devlog" "$@"
-}
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog.sh"
 
 # Verify Linux
 if [ "$(uname -s)" != "Linux" ]; then

@@ -15,10 +15,8 @@ Linux)
   ;;
 esac
 
-# Use devlog for consistent logging
-log() {
-  "$(dirname "$0")/../bin/devlog" "$@"
-}
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog.sh"
 
 install() {
   if [ -d "${HOMEBREW_PREFIX}" ] && [ -x "${HOMEBREW_PREFIX}/bin/brew" ]; then

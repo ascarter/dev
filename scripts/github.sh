@@ -2,10 +2,8 @@
 
 set -eu
 
-# Use devlog for consistent logging
-log() {
-  "$(dirname "$0")/../bin/devlog" "$@"
-}
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog.sh"
 
 # GitHub CLI extensions installer
 if command -v gh >/dev/null 2>&1; then

@@ -15,10 +15,8 @@ set -eu
 
 GIT_CONFIG_FILE="${HOME}/.gitconfig"
 
-# Use devlog for consistent logging
-log() {
-  "$(dirname "$0")/../bin/devlog" "$@"
-}
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog.sh"
 
 # Configure user identity
 configure_user() {

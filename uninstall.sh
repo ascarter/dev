@@ -10,16 +10,25 @@ DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
 DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
 TARGET=${TARGET:-$HOME}
 
-# Use devlog for consistent logging
-log() {
-  if [ -x "${DEV_HOME}/bin/devlog" ]; then
-    "${DEV_HOME}/bin/devlog" "$@"
-  else
-    # Fallback to echo if devlog not available
-    shift # Remove level
+# Source devlog library for consistent logging (with fallback if not available)
+if [ -f "${DEV_HOME}/bin/devlog.sh" ]; then
+  . "${DEV_HOME}/bin/devlog.sh"
+else
+  # Fallback log function if devlog not available
+  log() {
+    if [ "$#" -eq 0 ]; then
+      printf "\n"
+      return 0
+    fi
+    # Strip level if present
+    case "$1" in
+    info | warn | error | debug)
+      shift
+      ;;
+    esac
     echo "$@"
-  fi
-}
+  }
+fi
 
 usage() {
   echo "Usage: $0 [options]"
