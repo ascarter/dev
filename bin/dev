@@ -19,11 +19,11 @@ EXCLUDE_PATTERNS=".DS_Store Thumbs.db *.tmp .gitkeep"
 DEVLOG_BIN="$(dirname "$0")/devlog"
 
 log() {
-  DEVLOG_WIDTH=26 "${DEVLOG_BIN}" log "$@"
+  DEVLOG_WIDTH=26 "${DEVLOG_BIN}" info "$@"
 }
 
 vlog() {
-  VERBOSE=$VERBOSE "${DEVLOG_BIN}" verbose "$@"
+  VERBOSE=$VERBOSE "${DEVLOG_BIN}" debug "$@"
 }
 
 err() {
@@ -205,10 +205,10 @@ cmd_init() {
   fi
 
   # Add leading newline if file exists
-  [ -f "$zshenv" ] && printf "\n" >> "$zshenv"
+  [ -f "$zshenv" ] && printf "\n" >>"$zshenv"
 
   # Append bootstrap
-  printf "# dev - Development environment management\n%s\n" "$bootstrap_line" >> "$zshenv"
+  printf "# dev - Development environment management\n%s\n" "$bootstrap_line" >>"$zshenv"
 
   log "init" "Initialized dev for zsh"
   log "" "Restart your shell or run: source ~/.zshenv"
@@ -430,7 +430,7 @@ cmd_script() {
   # Parse arguments to find -- separator
   script_args=""
   found_separator=0
-  shift  # Remove script name
+  shift # Remove script name
 
   for arg in "$@"; do
     if [ "$arg" = "--" ]; then
