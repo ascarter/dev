@@ -57,7 +57,7 @@ usage() {
   log "  update" "Update dev from git and re-link"
   log "  edit" "Edit dev repository in \$EDITOR"
   log "  config <action>" "Manage configuration files (status|link|unlink)"
-  log "  host [platform] [action]" "Manage host provisioning (provision|update)"
+  log "  host [action]" "Manage host provisioning (provision|update)"
   log "  tool [name] [action]" "Manage tool installation"
   log ""
   usage_options
@@ -296,51 +296,34 @@ get_platform_id() {
 host_usage() {
   log "dev host" "Manage host provisioning"
   log ""
-  log "Usage:" "dev [options] host [platform] [action]"
+  log "Usage:" "dev [options] host [action]"
   log ""
   log "Actions:" ""
   log "  provision" "Provision host system (default)"
   log "  update" "Update host system packages"
   log ""
-  log "Platforms:" ""
-  log "  macos" "macOS"
-  log "  fedora" "Fedora Linux"
-  log "  ubuntu" "Ubuntu/Debian"
-  log ""
-  log "If platform is not specified, auto-detect current platform"
+  log "Platform is auto-detected from the system"
   log ""
   usage_options
 }
 
 cmd_host() {
-  action="${2:-provision}"
+  action="${1:-provision}"
 
   # Check for help
-  case "${1:-}" in
+  case "${action}" in
   -h | --help)
     host_usage
     return 0
     ;;
   esac
 
-  # Determine platform
-  if [ -n "${1:-}" ] && [ "$1" != "provision" ] && [ "$1" != "update" ]; then
-    platform="$1"
-    action="${2:-provision}"
-  else
-    platform=$(get_platform_id)
-    action="${1:-provision}"
-  fi
-
+  # Auto-detect platform
+  platform=$(get_platform_id)
   host_script="${DEV_HOME}/hosts/${platform}.sh"
 
   if [ ! -f "$host_script" ]; then
     err "No host script found for platform: $platform"
-    log ""
-    log "Available platforms:"
-    for script in "${DEV_HOME}/hosts"/*.sh; do
-      [ -f "$script" ] && log "  $(basename "$script" .sh)"
-    done
     exit 1
   fi
 
