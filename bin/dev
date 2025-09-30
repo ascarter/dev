@@ -59,6 +59,7 @@ usage() {
   log "  config <action>" "Manage configuration files (status|link|unlink)"
   log "  host" "Provision and update host system"
   log "  tool [name] [action]" "Manage tool installation"
+  log "  script [name] [-- args]" "Run utility script"
   log ""
   usage_options
   log "  -h" "Show help"
@@ -394,6 +395,79 @@ cmd_tool() {
   "${tool_script}" "${action}"
 }
 
+script_usage() {
+  log "dev script" "Run utility scripts"
+  log ""
+  log "Usage:" "dev [options] script [name] [-- args]"
+  log ""
+  log "If no name specified, lists available scripts"
+  log "Use -- to separate script name from script arguments"
+  log ""
+  log "Example:" "dev script gitconfig"
+  log "Example:" "dev script gpg-backup -- /path/to/backup"
+  log ""
+  usage_options
+}
+
+cmd_script() {
+  script_name="${1:-}"
+
+  # Check for help
+  case "${script_name}" in
+  -h | --help | "")
+    if [ -z "$script_name" ]; then
+      # List available scripts
+      log "script" "Available scripts:"
+      log ""
+      for script in "${DEV_HOME}/scripts"/*.sh; do
+        [ -f "$script" ] && log "  $(basename "$script" .sh)"
+      done
+      log ""
+      script_usage
+    else
+      script_usage
+    fi
+    return 0
+    ;;
+  esac
+
+  # Parse arguments to find -- separator
+  script_args=""
+  found_separator=0
+  shift  # Remove script name
+
+  for arg in "$@"; do
+    if [ "$arg" = "--" ]; then
+      found_separator=1
+      continue
+    fi
+
+    if [ $found_separator -eq 1 ]; then
+      script_args="$script_args $arg"
+    fi
+  done
+
+  script_path="${DEV_HOME}/scripts/${script_name}.sh"
+
+  if [ ! -f "$script_path" ]; then
+    err "No script found: $script_name"
+    log ""
+    log "Available scripts:"
+    for script in "${DEV_HOME}/scripts"/*.sh; do
+      [ -f "$script" ] && log "  $(basename "$script" .sh)"
+    done
+    exit 1
+  fi
+
+  if [ ! -x "$script_path" ]; then
+    err "Script not executable: $script_path"
+    exit 1
+  fi
+
+  vlog "script" "Running ${script_name}"
+  sh "${script_path}" $script_args
+}
+
 # ------------------------------
 # Main
 # ------------------------------
@@ -438,6 +512,9 @@ host)
   ;;
 tool)
   cmd_tool "$@"
+  ;;
+script)
+  cmd_script "$@"
   ;;
 *)
   if [ -n "$command" ]; then

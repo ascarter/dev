@@ -166,6 +166,21 @@ dev edit
 
 Uses the `$EDITOR` environment variable.
 
+### Script Runner
+
+Run utility scripts from the `scripts/` directory:
+```bash
+dev script                    # List available scripts
+dev script <name>             # Run a script
+dev script <name> -- <args>   # Run a script with arguments
+```
+
+**Example:**
+```bash
+dev script gitconfig          # Configure git for this machine
+dev script gpg-backup -- /path/to/backup
+```
+
 ## Directory Structure
 
 ```
@@ -218,26 +233,28 @@ All commands support these options:
 
 ## Scripts Directory
 
-The `scripts/` directory contains utility scripts that are run directly rather than through `dev tool`:
+The `scripts/` directory contains utility scripts that are run via `dev script <name>`:
 
 **Configuration:**
-- `github.sh` - GitHub CLI setup
-- `gpg.sh` - GPG configuration
-- `ssh.sh` - SSH configuration
+- `gitconfig` - Generate machine-specific git configuration
+- `github` - GitHub CLI setup
+- `gpg` - GPG configuration
+- `ssh` - SSH configuration
 
 **Backup/Restore:**
-- `gpg-backup.sh` - Backup GPG keys
-- `gpg-restore.sh` - Restore GPG keys
+- `gpg-backup` - Backup GPG keys
+- `gpg-restore` - Restore GPG keys
 
 **Specialized:**
-- `ssh-yk.sh` - YubiKey SSH configuration
-- `yubico.sh` - YubiKey tools setup
-- `tailnet.sh` - Tailscale network setup
-- `steam.sh` - Steam gaming platform
+- `ssh-yk` - YubiKey SSH configuration
+- `yubico` - YubiKey tools setup
+- `tailnet` - Tailscale network setup
+- `steam` - Steam gaming platform
 
-Run these scripts directly:
+Run these scripts using `dev script`:
 ```bash
-$DEV_HOME/scripts/gpg.sh
+dev script gitconfig
+dev script gpg-backup -- /path/to/backup
 ```
 
 ## Design Philosophy
