@@ -203,3 +203,7 @@ The `scripts/` directory contains utility and configuration scripts that are run
 - Subcommands show full command path (e.g., "dev config")
 - Reusable `usage_options()` for DRY
 - Options show actual current values (respects `-d` and `-t` overrides)
+- **IMPORTANT**: Always verify usage alignment after adding new commands
+  - Field width in `log()` function must accommodate longest label
+  - Current: `%-26s` (fits "script [name] [-- args]" = 24 chars)
+  - Test with `./bin/dev -h` and check all columns align properly

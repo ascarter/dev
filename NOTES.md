@@ -612,3 +612,74 @@ dev tool <name> status     # Show tool status
 - ✅ Homebrew tool adapted with full action support
 - ✅ Flatpak tool created with full action support
 - ✅ Host scripts integrate with tools system
+
+---
+
+## Script Runner System - COMPLETED (2025-09-30)
+
+### Implementation
+
+**Command:**
+```bash
+dev script                    # List available scripts
+dev script <name>             # Run a script
+dev script <name> -- <args>   # Run a script with arguments
+```
+
+**Features:**
+- Run scripts from anywhere (not just DEV_HOME)
+- Scripts executed with `sh` for consistency
+- Argument passing via `--` separator
+- Lists all available scripts when no name provided
+- Error handling for missing/non-executable scripts
+
+**Scripts:**
+- gitconfig.sh - Generate machine-specific git configuration (new)
+- github.sh, gpg.sh, ssh.sh - Configuration scripts
+- gpg-backup.sh, gpg-restore.sh - Backup/restore utilities
+- ssh-yk.sh, yubico.sh, tailnet.sh, steam.sh - Specialized setup
+
+**gitconfig.sh Details:**
+- Simplified from dotfiles version
+- Uses `git config --global` directly
+- Assumes gh CLI for GitHub (required)
+- Keeps GCM Azure DevOps configuration (work requirement)
+- Supports GPG commit signing with YubiKey
+- Targets ~/.gitconfig (machine-specific config)
+- Machine-independent config in $XDG_CONFIG_HOME/git/config
+
+**Testing:**
+- ✅ `dev script` lists all 10 scripts
+- ✅ `dev script gitconfig` runs successfully
+- ✅ Script runner works from any directory
+- ✅ Help system works correctly
+
+---
+
+## Important Reminders
+
+### Usage Alignment
+**CRITICAL:** Always verify usage output alignment when adding new commands.
+
+**Current Configuration:**
+- Field width: `%-26s` in `log()` function (bin/dev:22)
+- Longest label: "script [name] [-- args]" = 24 characters
+- Must have 2+ chars padding after longest label
+
+**Verification Steps:**
+1. After adding/modifying commands, run: `./bin/dev -h`
+2. Check that all descriptions align vertically
+3. If misaligned, increase field width in `log()` function
+4. Test all subcommand help too (`dev config -h`, `dev tool -h`, etc.)
+
+**Example of correct alignment:**
+```
+Commands:
+  env                     Export configuration for dev environment
+  script [name] [-- args] Run utility script
+```
+
+**Why This Matters:**
+- Professional appearance
+- Easy to read and scan
+- User experience quality signal
