@@ -156,12 +156,11 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 
 # =====================================
-# Load profile modules
+# Load rc modules
 # =====================================
-
-if [[ -d "${ZDOTDIR:-$HOME/.config/zsh}/profile.d" ]]; then
-  for profile in "${ZDOTDIR:-$HOME/.config/zsh}"/profile.d/*.sh(N); do
-    source "$profile"
+if [[ -d "${ZDOTDIR}/rc.d" ]]; then
+  for rc in "${ZDOTDIR}"/rc.d/*.sh(N); do
+    source "$rc"
   done
-  unset profile
+  unset rc
 fi

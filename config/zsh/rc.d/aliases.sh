@@ -3,6 +3,12 @@ if ! command -v zed >/dev/null 2>&1; then
   if command -v zed-preview >/dev/null 2>&1; then
     alias zed=zed-preview
   fi
+  alias devz="EDITOR=zed dev edit"
+fi
+
+alias devcd='cd ${DEV_HOME}'
+if [ -d ~/Developer ]; then
+  alias devd='cd ~/Developer'
 fi
 
 # ls - Use uutils if installed
@@ -13,9 +19,6 @@ fi
 alias la='ls -a -l'
 alias ll='ls -l'
 alias l.='ls -d .*'
-
-# developer
-alias dev="cd ${HOME}/Developer"
 
 # ssh
 alias sshpw="ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no"

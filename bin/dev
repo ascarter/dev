@@ -260,10 +260,18 @@ cmd_update() {
 }
 
 cmd_edit() {
-  log "edit" "Edit dev repository in \$EDITOR"
-  vlog "EDITOR" "${EDITOR:-not set}"
-  vlog "DEV_HOME" "$DEV_HOME"
-  # TODO: Implement editor opening
+  if [ -z "${EDITOR:-}" ]; then
+    err "EDITOR not set"
+    exit 1
+  fi
+
+  if [ ! -d "$DEV_HOME" ]; then
+    err "DEV_HOME not found: $DEV_HOME"
+    exit 1
+  fi
+
+  vlog "edit" "Opening $DEV_HOME in $EDITOR"
+  ${EDITOR} ${DEV_HOME}
 }
 
 cmd_host() {
