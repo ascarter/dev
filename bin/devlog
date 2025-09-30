@@ -1,0 +1,79 @@
+#!/bin/sh
+
+# devlog - Standard logging helper for dev scripts
+#
+# Usage:
+#   devlog log <label> [message]     - Log with bold label and message
+#   devlog info <label> [message]    - Info message (same as log)
+#   devlog warn <label> [message]    - Warning message (yellow label)
+#   devlog error <label> [message]   - Error message (red label, stderr)
+#   devlog verbose <label> [message] - Log only if VERBOSE=1
+#
+# Environment Variables:
+#   DEVLOG_WIDTH - Field width for label column (default: 16)
+#   VERBOSE      - Enable verbose logging (0 or 1)
+#
+# Examples:
+#   devlog log "install" "Installing package"
+#   devlog warn "deprecated" "This feature is deprecated"
+#   devlog error "failed" "Installation failed"
+#   devlog verbose "debug" "Debug information"
+#   DEVLOG_WIDTH=26 devlog log "long label" "Custom width"
+#
+# Integration in scripts:
+#   # Wrapper function for convenience
+#   log() {
+#     "$(dirname "$0")/../bin/devlog" log "$@"
+#   }
+
+set -eu
+
+# Default field width for label column (can be overridden with DEVLOG_WIDTH)
+FIELD_WIDTH=${DEVLOG_WIDTH:-16}
+
+log_format() {
+  label="$1"
+  message="${2:-}"
+  color="${3:-}"
+
+  # Treat empty string as "no message" (same as missing argument)
+  if [ -z "$message" ] || [ "$#" -lt 2 ]; then
+    # Single argument or empty message - just print it
+    printf "%s\n" "$label"
+  else
+    # Two arguments - format with label and message
+    if [ -n "$color" ]; then
+      printf "${color}$(tput bold)%-${FIELD_WIDTH}s$(tput sgr0) %s\n" "$label" "$message"
+    else
+      printf "$(tput bold)%-${FIELD_WIDTH}s$(tput sgr0) %s\n" "$label" "$message"
+    fi
+  fi
+}
+
+level="${1:-log}"
+shift 2>/dev/null || true
+
+case "$level" in
+log | info)
+  log_format "$@"
+  ;;
+warn | warning)
+  # Yellow text for warnings
+  log_format "$@" "$(tput setaf 3)"
+  ;;
+error | err)
+  # Red text for errors, output to stderr
+  log_format "$@" "$(tput setaf 1)" >&2
+  ;;
+verbose)
+  # Only log if VERBOSE is set
+  if [ "${VERBOSE:-0}" -eq 1 ]; then
+    log_format "$@"
+  fi
+  ;;
+*)
+  echo "devlog: unknown level '$level'" >&2
+  echo "Usage: devlog {log|info|warn|error|verbose} <label> [message]" >&2
+  exit 1
+  ;;
+esac

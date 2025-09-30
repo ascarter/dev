@@ -15,12 +15,9 @@ set -eu
 
 GIT_CONFIG_FILE="${HOME}/.gitconfig"
 
+# Use devlog for consistent logging
 log() {
-  if [ "$#" -eq 1 ]; then
-    printf "%s\n" "$1"
-  elif [ "$#" -gt 1 ]; then
-    printf "$(tput bold)%-16s$(tput sgr0) %s\n" "$1" "$2"
-  fi
+  "$(dirname "$0")/../bin/devlog" log "$@"
 }
 
 # Configure user identity

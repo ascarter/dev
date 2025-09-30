@@ -15,23 +15,19 @@ EXCLUDE_PATTERNS=".DS_Store Thumbs.db *.tmp .gitkeep"
 # Logging functions
 # ------------------------------
 
+# Wrapper functions that use devlog (in same directory as this script)
+DEVLOG_BIN="$(dirname "$0")/devlog"
+
 log() {
-  if [ "$#" -eq 1 ]; then
-    printf "%s\n" "$1"
-  elif [ "$#" -gt 1 ]; then
-    printf "$(tput bold)%-26s$(tput sgr0) %s\n" "$1" "$2"
-  fi
+  DEVLOG_WIDTH=26 "${DEVLOG_BIN}" log "$@"
 }
 
-# Verbose log
 vlog() {
-  if [ $VERBOSE -eq 1 ]; then
-    log "$@"
-  fi
+  VERBOSE=$VERBOSE "${DEVLOG_BIN}" verbose "$@"
 }
 
 err() {
-  echo "$*" >&2
+  "${DEVLOG_BIN}" error "$@"
 }
 
 # ------------------------------
