@@ -14,6 +14,11 @@ if command -v brew >/dev/null 2>&1; then
   [[ -d "$rustup_prefix/share/zsh/site-functions" ]] && fpath+=("$rustup_prefix/share/zsh/site-functions")
 fi
 
+# Add dev completions directory
+if [[ -d "${XDG_DATA_HOME}/zsh/completions" ]]; then
+  fpath=("${XDG_DATA_HOME}/zsh/completions" $fpath)
+fi
+
 # Enable advanced tab completion
 autoload -Uz compinit
 compinit -u
