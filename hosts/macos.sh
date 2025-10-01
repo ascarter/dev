@@ -5,7 +5,7 @@
 set -eu
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 # Verify macOS
 if [ "$(uname -s)" != "Darwin" ]; then

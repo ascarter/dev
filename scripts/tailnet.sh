@@ -5,7 +5,7 @@
 set -eu
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 case $(uname -s) in
 Darwin)

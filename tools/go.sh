@@ -7,7 +7,7 @@ XDG_BIN_HOME=${XDG_BIN_HOME:-${XDG_DATA_HOME}/../bin}
 GOROOT="${GOROOT:-${XDG_DATA_HOME}/go}"
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 install() {
   # Detect OS and architecture

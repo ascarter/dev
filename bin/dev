@@ -17,7 +17,7 @@ EXCLUDE_PATTERNS=".DS_Store Thumbs.db *.tmp .gitkeep"
 
 # Source devlog library for performance
 DEVLOG_WIDTH=26
-. "$(dirname "$0")/devlog.sh"
+. "$(dirname "$0")/devlog"
 
 # Wrapper functions with custom width
 vlog() {

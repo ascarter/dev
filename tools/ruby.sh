@@ -7,7 +7,7 @@ RBENV_ROOT="${RBENV_ROOT:-${XDG_DATA_HOME}/rbenv}"
 RUBY_CONFIGURE_OPTS="--enable-yjit"
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 latest() {
   # Verify rustc is available

@@ -2,12 +2,22 @@
 
 # devlog - Standard logging helper for dev scripts
 #
-# Usage:
+# Can be used as a standalone command OR sourced as a library
+#
+# === STANDALONE USAGE ===
 #   devlog <message>                 - Log message with default (info) level
 #   devlog info <label> [message]    - Info message (default)
 #   devlog warn <label> [message]    - Warning message (yellow label)
 #   devlog error <label> [message]   - Error message (red label, stderr)
 #   devlog debug <label> [message]   - Log only if VERBOSE=1
+#
+# === LIBRARY USAGE ===
+#   . "$DEV_HOME/bin/devlog"
+#   log info "install" "Installing package"
+#   log warn "deprecated" "This feature is deprecated"
+#   log error "failed" "Installation failed"
+#   log debug "trace" "Debug information"
+#   log "simple" "Just a message"
 #
 # Environment Variables:
 #   DEVLOG_WIDTH - Field width for label column (default: 16)
@@ -16,23 +26,19 @@
 # Examples:
 #   devlog "Simple message"
 #   devlog info "install" "Installing package"
-#   devlog warn "deprecated" "This feature is deprecated"
-#   devlog error "failed" "Installation failed"
-#   devlog debug "trace" "Debug information"
 #   DEVLOG_WIDTH=26 devlog info "long label" "Custom width"
-#
-# Integration in scripts:
-#   # Wrapper function for convenience
-#   log() {
-#     "$(dirname "$0")/../bin/devlog" info "$@"
-#   }
 
-set -eu
+# Prevent multiple sourcing
+if [ -n "${DEVLOG_SOURCED:-}" ]; then
+  return 0 2>/dev/null || exit 0
+fi
+DEVLOG_SOURCED=1
 
 # Default field width for label column (can be overridden with DEVLOG_WIDTH)
-FIELD_WIDTH=${DEVLOG_WIDTH:-16}
+DEVLOG_FIELD_WIDTH=${DEVLOG_WIDTH:-16}
 
-log_format() {
+# Internal formatting function
+_devlog_format() {
   label="${1:-}"
   message="${2:-}"
   color="${3:-}"
@@ -48,54 +54,80 @@ log_format() {
   else
     # Two arguments - format with label and message
     if [ -n "$color" ]; then
-      printf "${color}$(tput bold)%-${FIELD_WIDTH}s$(tput sgr0) %s\n" "$label" "$message"
+      printf "${color}$(tput bold)%-${DEVLOG_FIELD_WIDTH}s$(tput sgr0) %s\n" "$label" "$message"
     else
-      printf "$(tput bold)%-${FIELD_WIDTH}s$(tput sgr0) %s\n" "$label" "$message"
+      printf "$(tput bold)%-${DEVLOG_FIELD_WIDTH}s$(tput sgr0) %s\n" "$label" "$message"
     fi
   fi
 }
 
-# Parse arguments to determine level, label, and message
-if [ "$#" -eq 0 ]; then
-  echo "devlog: no arguments provided" >&2
-  echo "Usage: devlog {info|warn|error|debug} <label> [message]" >&2
-  echo "       devlog <message>" >&2
-  exit 1
-fi
-
-# Check if first argument is a known level and canonicalize it
-case "$1" in
-info | warn | error | debug)
-  level="$1"
-  shift
-  label="${1:-}"
-  message="${2:-}"
-  ;;
-*)
-  # First arg is not a level, treat as label with default level (info)
-  level="info"
-  label="$1"
-  message=""
-  ;;
-esac
-
-# Now execute based on level, passing clear parameters
-case "$level" in
-info)
-  log_format "$label" "$message"
-  ;;
-warn)
-  # Yellow text for warnings
-  log_format "$label" "$message" "$(tput setaf 3)"
-  ;;
-error)
-  # Red text for errors, output to stderr
-  log_format "$label" "$message" "$(tput setaf 1)" >&2
-  ;;
-debug)
-  # Only log if VERBOSE is set
-  if [ "${VERBOSE:-0}" -eq 1 ]; then
-    log_format "$label" "$message"
+# Main log function (exported for library use)
+log() {
+  # Handle empty arguments
+  if [ "$#" -eq 0 ]; then
+    printf "\n"
+    return 0
   fi
+
+  # Check if first argument is a known level
+  case "$1" in
+  info | warn | error | debug)
+    level="$1"
+    shift
+    label="${1:-}"
+    message="${2:-}"
+    ;;
+  *)
+    # First arg is not a level, treat as label with default level (info)
+    level="info"
+    label="$1"
+    message="${2:-}"
+    ;;
+  esac
+
+  # Execute based on level
+  case "$level" in
+  info)
+    _devlog_format "$label" "$message"
+    ;;
+  warn)
+    # Yellow text for warnings
+    _devlog_format "$label" "$message" "$(tput setaf 3)"
+    ;;
+  error)
+    # Red text for errors, output to stderr
+    _devlog_format "$label" "$message" "$(tput setaf 1)" >&2
+    ;;
+  debug)
+    # Only log if VERBOSE is set
+    if [ "${VERBOSE:-0}" -eq 1 ]; then
+      _devlog_format "$label" "$message"
+    fi
+    ;;
+  esac
+}
+
+# Main function for standalone execution
+_devlog_main() {
+  if [ "$#" -eq 0 ]; then
+    echo "devlog: no arguments provided" >&2
+    echo "Usage: devlog {info|warn|error|debug} <label> [message]" >&2
+    echo "       devlog <message>" >&2
+    exit 1
+  fi
+
+  # Use the log function
+  log "$@"
+}
+
+# Detect if script is being executed (not sourced)
+# This works by checking if $0 matches the script name
+case "${0##*/}" in
+devlog)
+  # Script is being executed directly
+  set -eu
+  _devlog_main "$@"
   ;;
 esac
+
+# If sourced, the log function is now available

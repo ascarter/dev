@@ -9,7 +9,7 @@ UV_TOOL_DIR="${UV_TOOL_DIR:-${UV_HOME}/tools}"
 UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-${UV_HOME}/bin}"
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 install() {
   # Check if uv is already installed

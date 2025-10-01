@@ -5,7 +5,7 @@
 set -eu
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 # Verify Linux
 if [ "$(uname -s)" != "Linux" ]; then

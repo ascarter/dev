@@ -5,7 +5,7 @@
 set -eu
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 # Set default values for environment variables if not already set
 : "${XDG_CONFIG_HOME:=${HOME}/.config}"

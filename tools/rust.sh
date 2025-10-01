@@ -7,7 +7,7 @@ RUSTUP_HOME="${RUSTUP_HOME:-${XDG_DATA_HOME}/rustup}"
 CARGO_HOME="${CARGO_HOME:-${XDG_DATA_HOME}/cargo}"
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 install() {
   # Check if rustup is already installed

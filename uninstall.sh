@@ -11,8 +11,8 @@ DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
 TARGET=${TARGET:-$HOME}
 
 # Source devlog library for consistent logging (with fallback if not available)
-if [ -f "${DEV_HOME}/bin/devlog.sh" ]; then
-  . "${DEV_HOME}/bin/devlog.sh"
+if [ -f "${DEV_HOME}/bin/devlog" ]; then
+  . "${DEV_HOME}/bin/devlog"
 else
   # Fallback log function if devlog not available
   log() {

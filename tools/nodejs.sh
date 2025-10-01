@@ -7,7 +7,7 @@ XDG_BIN_HOME=${XDG_BIN_HOME:-${XDG_DATA_HOME}/../bin}
 FNM_DIR="${FNM_DIR:-${XDG_DATA_HOME}/fnm}"
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 install() {
   # Check if fnm is already installed

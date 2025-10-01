@@ -5,7 +5,7 @@
 set -eu
 
 # Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog.sh"
+. "$(dirname "$0")/../bin/devlog"
 
 install() {
   if ! command -v flatpak >/dev/null 2>&1; then

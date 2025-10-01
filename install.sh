@@ -15,8 +15,8 @@ DEV_BRANCH=${DEV_BRANCH:-main}
 TARGET=${TARGET:-$HOME}
 
 # Source devlog library for consistent logging (with fallback if not yet installed)
-if [ -f "${DEV_HOME}/bin/devlog.sh" ]; then
-  . "${DEV_HOME}/bin/devlog.sh"
+if [ -f "${DEV_HOME}/bin/devlog" ]; then
+  . "${DEV_HOME}/bin/devlog"
 else
   # Fallback log function if devlog not yet installed
   log() {
