@@ -138,11 +138,21 @@ else
   fi
 fi
 
+DEV_FLAGS="-d ${DEV_HOME} -t ${TARGET}"
+
 # Init dev
-"${DEV_HOME}/bin/dev" ${FLAGS} -d "${DEV_HOME}" -t "${TARGET}" init
+"${DEV_HOME}/bin/dev" ${FLAGS} ${DEV_FLAGS} init
 
 # Link config files
-"${DEV_HOME}/bin/dev" ${FLAGS} -d "${DEV_HOME}" -t "${TARGET}" config link
+"${DEV_HOME}/bin/dev" ${FLAGS} ${DEV_FLAGS} config link
+
+# Install ubi for tool installs
+if ! command -v ubi >/dev/null 2>&1; then
+  log info "install" "Installing ubi"
+  "${DEV_HOME}/bin/dev" ${FLAGS} ${DEV_FLAGS} tool ubi ${FLAGS} install
+else
+  log info "install" "ubi already installed, skipping"
+fi
 
 # Run appropriate host provisioning script
 HOST_SCRIPT="${DEV_HOME}/hosts/${PLATFORM_ID}.sh"

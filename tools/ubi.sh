@@ -41,9 +41,7 @@ update() {
   fi
 
   log info "ubi" "updating ubi"
-
-  # Call internal install function to reinstall
-  _do_install
+  ubi --self-upgrade
 }
 
 uninstall() {
