@@ -53,12 +53,12 @@ status() {
     # Check if Node.js is available via fnm
     if command -v node >/dev/null 2>&1; then
       node_version=$(node --version 2>/dev/null | sed 's/^v//' || echo "none")
-      log info "nodejs" "fnm installed (v${fnm_version}), Node.js: ${node_version}"
+      log info "nodejs" "fnm ${fnm_version}, node ${node_version}"
     else
-      log info "nodejs" "fnm installed (v${fnm_version}), Node.js: not installed"
+      log info "nodejs" "fnm ${fnm_version}, node not installed"
     fi
   else
-    log info "nodejs" "fnm not installed"
+    log info "nodejs" "not installed"
   fi
 }
 

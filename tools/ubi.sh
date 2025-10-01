@@ -67,10 +67,9 @@ uninstall() {
 
 status() {
   if command -v ubi >/dev/null 2>&1; then
-    local version ubi_path
+    local version
     version=$(ubi --version 2>&1 | head -1 || echo "unknown")
-    ubi_path=$(command -v ubi)
-    log info "ubi" "installed at ${ubi_path}, ${version}"
+    log info "ubi" "${version}"
   else
     log info "ubi" "not installed"
   fi

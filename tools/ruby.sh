@@ -107,7 +107,7 @@ status() {
   if [ -d "${RBENV_ROOT}" ] && [ -x "${RBENV_ROOT}/bin/rbenv" ]; then
     local current_version
     current_version=$("${RBENV_ROOT}/bin/rbenv" version-name 2>/dev/null || echo "none")
-    log info "ruby" "rbenv installed, current: ${current_version}"
+    log info "ruby" "rbenv, current: ${current_version}"
   else
     log info "ruby" "not installed"
   fi

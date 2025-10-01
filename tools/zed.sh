@@ -96,27 +96,21 @@ uninstall() {
 
 status() {
   if command -v zed >/dev/null 2>&1; then
-    local version zed_path app_path channel
+    local version channel
     version=$(zed --version 2>&1 | head -1 || echo "unknown")
-    zed_path=$(command -v zed)
 
     # Detect channel from app path
     if [ -d "/Applications/Zed Preview.app" ]; then
       channel="preview"
-      app_path="/Applications/Zed Preview.app"
     elif [ -d "/Applications/Zed.app" ]; then
       channel="stable"
-      app_path="/Applications/Zed.app"
     elif [ -d "${HOME}/.local/zed.app" ]; then
       channel="stable"
-      app_path="${HOME}/.local/zed.app"
     else
       channel="unknown"
-      app_path="unknown"
     fi
 
-    log info "zed" "installed at ${zed_path}, ${version}"
-    log info "zed" "channel: ${channel}, app: ${app_path}"
+    log info "zed" "${version} (${channel})"
   else
     log info "zed" "not installed"
   fi

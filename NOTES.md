@@ -833,14 +833,14 @@ Both tools now have full CRUD operations:
 - `install` - Install via official script (idempotent)
 - `update` - Self-update via `claude update`
 - `uninstall` - Remove binary and ~/.claude directory
-- `status` - Show version, path, and data directory size
+- `status` - Show version only
 - Note: Claude hardcodes ~/.claude for data (not XDG compliant)
 
 **zed.sh:**
 - `install` - Install via official script (idempotent)
 - `update` - Reinstall to ensure latest (Zed auto-updates itself)
 - `uninstall` - Remove app bundle and CLI symlink (both macOS and Linux)
-- `status` - Show version, channel (stable/preview), and app path
+- `status` - Show version and channel (stable/preview)
 - Internal `_do_install()` function to bypass "already installed" check for updates
 
 **Pattern:**

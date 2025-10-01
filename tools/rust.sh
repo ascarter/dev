@@ -45,7 +45,7 @@ status() {
   if command -v rustup >/dev/null 2>&1; then
     local current_version
     current_version=$(rustup show active-toolchain 2>/dev/null | cut -d' ' -f1 || echo "none")
-    log info "rust" "rustup installed, current: ${current_version}"
+    log info "rust" "rustup, current: ${current_version}"
   else
     log info "rust" "not installed"
   fi

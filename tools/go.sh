@@ -148,7 +148,7 @@ status() {
   if [ -d "${GOROOT}" ] && [ -x "${GOROOT}/bin/go" ]; then
     local current_version
     current_version=$("${GOROOT}/bin/go" version 2>/dev/null | cut -d' ' -f3 || echo "unknown")
-    log info "go" "installed, version: ${current_version}"
+    log info "go" "${current_version}"
   else
     log info "go" "not installed"
   fi

@@ -71,7 +71,7 @@ status() {
   if command -v brew >/dev/null 2>&1; then
     local version
     version=$(brew --version 2>/dev/null | head -1 || echo "unknown")
-    log info "homebrew" "installed: ${version}"
+    log info "homebrew" "${version}"
   else
     log info "homebrew" "not installed"
   fi

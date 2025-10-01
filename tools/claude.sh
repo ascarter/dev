@@ -76,17 +76,9 @@ uninstall() {
 
 status() {
   if command -v claude >/dev/null 2>&1; then
-    local version claude_path
+    local version
     version=$(claude --version 2>&1 | head -1 || echo "unknown")
-    claude_path=$(command -v claude)
-    log info "claude" "installed at ${claude_path}, version: ${version}"
-
-    # Show data directory info
-    if [ -d "${CLAUDE_DIR}" ]; then
-      local dir_size
-      dir_size=$(du -sh "${CLAUDE_DIR}" 2>/dev/null | cut -f1 || echo "unknown")
-      log info "claude" "data directory: ${CLAUDE_DIR} (${dir_size})"
-    fi
+    log info "claude" "${version}"
   else
     log info "claude" "not installed"
   fi

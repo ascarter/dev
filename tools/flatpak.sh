@@ -83,17 +83,14 @@ uninstall() {
 
 status() {
   if ! command -v flatpak >/dev/null 2>&1; then
-    log info "flatpak" "flatpak not available"
+    log info "flatpak" "not available"
     return 0
   fi
 
-  local version
+  local version app_count
   version=$(flatpak --version 2>/dev/null | cut -d' ' -f2 || echo "unknown")
-  log info "flatpak" "version: ${version}"
-
-  local app_count
-  app_count=$(flatpak list --app 2>/dev/null | wc -l)
-  log info "flatpak" "installed applications: ${app_count}"
+  app_count=$(flatpak list --app 2>/dev/null | wc -l | tr -d ' ')
+  log info "flatpak" "${version}, ${app_count} apps"
 }
 
 # Handle command line arguments

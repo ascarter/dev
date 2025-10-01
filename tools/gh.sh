@@ -85,9 +85,9 @@ uninstall() {
 
 status() {
   if command -v gh >/dev/null 2>&1; then
+    local version
     version=$(gh --version 2>&1 | head -1 || echo "unknown")
-    gh_path=$(command -v gh)
-    log info "gh" "installed at ${gh_path}, ${version}"
+    log info "gh" "${version}"
   else
     log info "gh" "not installed"
   fi

@@ -62,9 +62,9 @@ status() {
   if command -v uv >/dev/null 2>&1; then
     local current_version
     current_version=$(uv --version 2>/dev/null | cut -d' ' -f2 || echo "unknown")
-    log info "python" "uv installed, version: ${current_version}"
+    log info "python" "uv ${current_version}"
   else
-    log info "python" "uv not installed"
+    log info "python" "not installed"
   fi
 }
 
