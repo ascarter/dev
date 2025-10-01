@@ -170,18 +170,20 @@ The `scripts/` directory contains utility and configuration scripts that are run
 
 **Completed:**
 - ✅ `bin/dev` - Main command with full option parsing and help
+- ✅ `bin/devlog` - Standard logging helper (sourceable library + standalone)
 - ✅ `dev env` - Environment export with ZDOTDIR for shell integration
 - ✅ `dev init` - Shell initialization (writes bootstrap to ~/.zshenv)
 - ✅ `dev edit` - Opens DEV_HOME in $EDITOR
 - ✅ `dev config` - Complete symlink management (status/link/unlink)
 - ✅ `dev host` - Idempotent platform provisioning (auto-detects platform)
-- ✅ `dev tool` - Tool installation management (install/update/uninstall/status)
+- ✅ `dev tool` - Tool installation management with help and status-all support
+- ✅ `dev script` - Script runner for utility scripts
 - ✅ `config/` - All configuration files ported from dotfiles
 - ✅ `config/zsh/` - ZSH configuration with rc.d modules
-- ✅ `hosts/` - Platform scripts (macos, fedora, ubuntu) - fully idempotent
-- ✅ `tools/` - 11 tool installation scripts (languages, package managers, applications)
-- ✅ `scripts/` - 9 utility and configuration scripts
-- ✅ `install.sh` and `uninstall.sh` - Bootstrap scripts
+- ✅ `hosts/` - Platform scripts (macos, fedora, ubuntu) - fully idempotent with devlog
+- ✅ `tools/` - 11 tool installation scripts (all using devlog library)
+- ✅ `scripts/` - 10 utility and configuration scripts (gitconfig, github, ssh, etc.)
+- ✅ `install.sh` and `uninstall.sh` - Bootstrap scripts with devlog
 
 **To Do:**
 - ⏳ `dev update` - Git update and re-link
@@ -198,12 +200,34 @@ The `scripts/` directory contains utility and configuration scripts that are run
 - Invalid subcommand actions: Show error then subcommand usage
 - Pattern: "command: error message"
 
+**Logging Patterns:**
+All scripts use the devlog library for consistent logging:
+```sh
+# Source devlog library for performance (at top of script)
+. "$(dirname "$0")/../bin/devlog"
+
+# Then use log function directly
+log info "label" "message"     # Info (default level)
+log warn "label" "message"     # Warning (yellow)
+log error "label" "message"    # Error (red, stderr)
+log debug "label" "message"    # Only if VERBOSE=1
+log "label" "message"          # Info without explicit level
+log ""                         # Empty line
+```
+
+**Custom Field Width:**
+```sh
+# Set DEVLOG_WIDTH before sourcing for wider labels
+DEVLOG_WIDTH=26
+. "$(dirname "$0")/devlog"
+```
+
 **Usage Display:**
 - Shows expanded path values, not just variable names
 - Subcommands show full command path (e.g., "dev config")
 - Reusable `usage_options()` for DRY
 - Options show actual current values (respects `-d` and `-t` overrides)
 - **IMPORTANT**: Always verify usage alignment after adding new commands
-  - Field width in `log()` function must accommodate longest label
-  - Current: `%-26s` (fits "script [name] [-- args]" = 24 chars)
+  - Field width controlled by `DEVLOG_WIDTH` environment variable
+  - Current: `DEVLOG_WIDTH=26` in bin/dev (fits "script [name] [-- args]" = 24 chars)
   - Test with `./bin/dev -h` and check all columns align properly

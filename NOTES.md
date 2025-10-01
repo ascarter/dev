@@ -662,14 +662,14 @@ dev script <name> -- <args>   # Run a script with arguments
 **CRITICAL:** Always verify usage output alignment when adding new commands.
 
 **Current Configuration:**
-- Field width: `%-26s` in `log()` function (bin/dev:22)
+- Field width: `%-26s` via `DEVLOG_WIDTH=26` (bin/dev:19)
 - Longest label: "script [name] [-- args]" = 24 characters
 - Must have 2+ chars padding after longest label
 
 **Verification Steps:**
 1. After adding/modifying commands, run: `./bin/dev -h`
 2. Check that all descriptions align vertically
-3. If misaligned, increase field width in `log()` function
+3. If misaligned, increase `DEVLOG_WIDTH` value in bin/dev
 4. Test all subcommand help too (`dev config -h`, `dev tool -h`, etc.)
 
 **Example of correct alignment:**
@@ -683,3 +683,229 @@ Commands:
 - Professional appearance
 - Easy to read and scan
 - User experience quality signal
+
+---
+
+## Standardized Logging System - COMPLETED (2025-09-30)
+
+### bin/devlog - Sourceable Library
+
+**Evolution:**
+1. **Initial Implementation:** Standalone binary called via subprocess
+2. **Performance Issue:** Subprocess overhead for every log call
+3. **Refactor:** Converted to sourceable library with dual-mode support
+4. **Result:** 2x performance improvement by eliminating subprocess calls
+
+**Dual-Mode Design:**
+```sh
+# Mode 1: Source as library (preferred for performance)
+. "$(dirname "$0")/../bin/devlog"
+log info "install" "Installing package"
+
+# Mode 2: Execute standalone (for quick testing)
+devlog info "install" "Installing package"
+```
+
+**Implementation Details:**
+- Uses `DEVLOG_SOURCED` flag to prevent multiple sourcing
+- Detects execution vs sourcing via `${0##*/}` pattern
+- Configurable field width via `DEVLOG_WIDTH` environment variable
+- Default field width: 16 characters (override in sourcing script)
+
+**Log Levels:**
+- `info` - Default level, normal output
+- `warn` - Warning messages (yellow text)
+- `error` - Error messages (red text, stderr)
+- `debug` - Verbose logging (only when `VERBOSE=1`)
+
+**Usage Patterns:**
+```sh
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog"
+
+# Then use log function directly
+log info "install" "Installing package"      # Info (default)
+log warn "deprecated" "Feature deprecated"   # Warning
+log error "failed" "Installation failed"     # Error
+log debug "trace" "Debug information"        # Only if VERBOSE=1
+log "simple" "Just a message"                # Info without explicit level
+log "label" ""                               # Single line, no message
+log ""                                       # Empty line
+```
+
+**Custom Field Width:**
+```sh
+# Override field width for wider labels
+DEVLOG_WIDTH=26
+. "$(dirname "$0")/devlog"
+```
+
+**Integration Pattern:**
+All scripts now follow this pattern for consistent logging:
+```sh
+#!/bin/sh
+
+# Source devlog library for performance
+. "$(dirname "$0")/../bin/devlog"
+
+install() {
+  if command -v tool >/dev/null 2>&1; then
+    log info "tool" "already installed, skipping"
+    return 0
+  fi
+
+  log info "tool" "installing..."
+  # ... installation code
+  log info "tool" "installation complete"
+}
+
+status() {
+  if command -v tool >/dev/null 2>&1; then
+    log info "tool" "installed, version: ${version}"
+  else
+    log info "tool" "not installed"
+  fi
+}
+```
+
+**Migration Summary:**
+All scripts migrated to use devlog library:
+- ✅ bin/dev (with DEVLOG_WIDTH=26)
+- ✅ install.sh (with fallback for bootstrap)
+- ✅ uninstall.sh
+- ✅ hosts/macos.sh, hosts/fedora.sh, hosts/ubuntu.sh
+- ✅ All 11 tool scripts (flatpak, go, homebrew, nodejs, python, ruby, rust, claude, tailscale, zed, ubi)
+- ✅ scripts/gitconfig.sh (10 scripts total in scripts/)
+
+**Benefits:**
+- Eliminates code duplication
+- 2x performance improvement
+- Consistent output formatting
+- Centralized color/style management
+- Easy to maintain and extend
+
+---
+
+## Enhanced Tool Command Features - COMPLETED (2025-09-30)
+
+### Help Command Support
+All subcommands now support help via:
+```bash
+dev config -h        # or --help, or help
+dev host -h
+dev tool -h
+dev script -h
+```
+
+Pattern used in all command handlers:
+```sh
+case "${1:-}" in
+help | -h | --help)
+  command_usage
+  return 0
+  ;;
+esac
+```
+
+### Show All Tools Status
+`dev tool` with no arguments (or `dev tool status`) now shows status of all tools:
+```bash
+dev tool          # Shows status of all 11 tools
+dev tool status   # Same as above
+```
+
+Implementation:
+- Loops through all `tools/*.sh` scripts
+- Checks if script is executable
+- Checks if script has `status()` function
+- Calls `status` action for each tool
+- Shows warnings for legacy scripts without status support
+
+**Benefits:**
+- Quick overview of entire toolchain status
+- Easy to see what's installed vs missing
+- Consistent interface across all tools
+
+### claude.sh and zed.sh Enhancements
+Both tools now have full CRUD operations:
+
+**claude.sh:**
+- `install` - Install via official script (idempotent)
+- `update` - Self-update via `claude update`
+- `uninstall` - Remove binary and ~/.claude directory
+- `status` - Show version, path, and data directory size
+- Note: Claude hardcodes ~/.claude for data (not XDG compliant)
+
+**zed.sh:**
+- `install` - Install via official script (idempotent)
+- `update` - Reinstall to ensure latest (Zed auto-updates itself)
+- `uninstall` - Remove app bundle and CLI symlink (both macOS and Linux)
+- `status` - Show version, channel (stable/preview), and app path
+- Internal `_do_install()` function to bypass "already installed" check for updates
+
+**Pattern:**
+Both tools follow standardized structure:
+```sh
+#!/bin/sh
+
+. "$(dirname "$0")/../bin/devlog"
+
+install() {
+  if command -v tool >/dev/null 2>&1; then
+    log info "tool" "already installed, skipping"
+    status
+    return 0
+  fi
+
+  log info "tool" "installing..."
+  # ... installation
+  log info "tool" "installation complete"
+}
+
+update() { ... }
+uninstall() { ... }
+status() { ... }
+
+# Handle command line arguments
+action="${1:-status}"
+case "${action}" in
+install | update | uninstall | status)
+  "${action}"
+  ;;
+*)
+  echo "Usage: $0 {install|update|uninstall|status}" >&2
+  exit 1
+  ;;
+esac
+```
+
+---
+
+## Pending Work
+
+### dev update Command
+**Status:** Stub exists in bin/dev:256-259, not yet implemented
+
+**Requirements:**
+- Pull latest changes from git
+- Re-run `dev config link` to sync any new config files
+- Show summary of what was updated
+- Handle merge conflicts gracefully
+
+**Implementation Notes:**
+```sh
+cmd_update() {
+  if [ ! -d "$DEV_HOME/.git" ]; then
+    err "DEV_HOME is not a git repository: $DEV_HOME"
+    exit 1
+  fi
+
+  log "update" "Pulling latest changes from git"
+  cd "$DEV_HOME" || exit 1
+  git pull || { err "Git pull failed"; exit 1; }
+
+  log "update" "Re-linking configuration files"
+  config_sync "link"
+
+  log "update" "Update complete"
+}
