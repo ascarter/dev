@@ -228,6 +228,10 @@ config_usage() {
 cmd_config() {
   action="$1"
   case "$action" in
+  help | -h | --help)
+    config_usage
+    return 0
+    ;;
   status)
     VERBOSE=1
     config_sync "list"
@@ -304,7 +308,7 @@ host_usage() {
 cmd_host() {
   # Check for help
   case "${1:-}" in
-  -h | --help)
+  help | -h | --help)
     host_usage
     return 0
     ;;
@@ -339,6 +343,7 @@ tool_usage() {
   log "  update" "Update the tool"
   log "  status" "Show tool status (default)"
   log "  setup" "Configure the tool (for config-only tools)"
+  log "  help" "Show tool usage/help"
   log ""
   log "If no name specified, shows status of all tools"
   log "If no action specified, shows status of the named tool"
@@ -352,7 +357,7 @@ cmd_tool() {
 
   # Check for help
   case "${tool_name}" in
-  -h | --help)
+  help | -h | --help)
     tool_usage
     return 0
     ;;
@@ -389,6 +394,11 @@ cmd_tool() {
       fi
     done
     return 0
+  fi
+
+  # Check if action is help
+  if [ "$action" = "help" ]; then
+    action="--help"
   fi
 
   tool_script="${DEV_HOME}/tools/${tool_name}.sh"
@@ -431,7 +441,7 @@ cmd_script() {
 
   # Check for help
   case "${script_name}" in
-  -h | --help | "")
+  help | -h | --help | "")
     if [ -z "$script_name" ]; then
       # List available scripts
       log "script" "Available scripts:"
@@ -509,6 +519,10 @@ shift 2>/dev/null || true
 
 # Execute command
 case "$command" in
+help | -h | --help)
+  usage
+  exit 0
+  ;;
 env)
   cmd_env "$@"
   ;;
