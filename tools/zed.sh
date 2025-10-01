@@ -14,20 +14,14 @@ ZED_CHANNEL=${ZED_CHANNEL:-stable}
 . "$(dirname "$0")/../bin/devlog"
 
 install() {
-  local force_install="${1:-}"
-
   # Check if zed is already installed
-  if command -v zed >/dev/null 2>&1 && [ "$force_install" != "--force" ]; then
+  if command -v zed >/dev/null 2>&1; then
     log info "zed" "already installed, skipping"
     status
     return 0
   fi
 
-  if [ "$force_install" = "--force" ]; then
-    log info "zed" "reinstalling Zed editor (${ZED_CHANNEL} channel)"
-  else
-    log info "zed" "installing Zed editor (${ZED_CHANNEL} channel)"
-  fi
+  log info "zed" "installing Zed editor (${ZED_CHANNEL} channel)"
 
   # Install via official script
   if ! curl -fsSL https://zed.dev/install.sh | ZED_CHANNEL=$ZED_CHANNEL sh; then
@@ -35,11 +29,19 @@ install() {
     return 1
   fi
 
-  if [ "$force_install" = "--force" ]; then
-    log info "zed" "reinstall complete"
-  else
-    log info "zed" "installation complete"
+  log info "zed" "installation complete"
+}
+
+_do_install() {
+  # Internal function that actually performs the installation
+  log info "zed" "installing Zed editor (${ZED_CHANNEL} channel)"
+
+  if ! curl -fsSL https://zed.dev/install.sh | ZED_CHANNEL=$ZED_CHANNEL sh; then
+    log error "zed" "installation failed"
+    return 1
   fi
+
+  log info "zed" "installation complete"
 }
 
 update() {
@@ -50,8 +52,8 @@ update() {
 
   log info "zed" "Zed auto-updates itself, reinstalling to ensure latest"
 
-  # Call install with force flag to reinstall
-  install --force
+  # Call internal install function to bypass the "already installed" check
+  _do_install
 }
 
 uninstall() {
