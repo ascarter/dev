@@ -331,7 +331,7 @@ cmd_host() {
 tool_usage() {
   log "dev tool" "Manage development tools"
   log ""
-  log "Usage:" "dev [options] tool <name> [action]"
+  log "Usage:" "dev [options] tool [name] [action]"
   log ""
   log "Actions:" ""
   log "  install" "Install the tool"
@@ -340,7 +340,8 @@ tool_usage() {
   log "  status" "Show tool status (default)"
   log "  setup" "Configure the tool (for config-only tools)"
   log ""
-  log "If no action specified, shows status"
+  log "If no name specified, shows status of all tools"
+  log "If no action specified, shows status of the named tool"
   log ""
   usage_options
 }
@@ -351,22 +352,44 @@ cmd_tool() {
 
   # Check for help
   case "${tool_name}" in
-  -h | --help | "")
-    if [ -z "$tool_name" ]; then
-      # List available tools
-      log "tool" "Available tools:"
-      log ""
-      for tool in "${DEV_HOME}/tools"/*.sh; do
-        [ -f "$tool" ] && log "  $(basename "$tool" .sh)"
-      done
-      log ""
-      tool_usage
-    else
-      tool_usage
-    fi
+  -h | --help)
+    tool_usage
     return 0
     ;;
   esac
+
+  # If no tool name specified OR tool name is 'status', show status of all tools
+  if [ -z "$tool_name" ] || [ "$tool_name" = "status" ]; then
+    log "tool" "Status of all tools:"
+    log ""
+    for tool_script in "${DEV_HOME}/tools"/*.sh; do
+      if [ -f "$tool_script" ]; then
+        tool=$(basename "$tool_script" .sh)
+
+        # Check if script is executable
+        if [ ! -x "$tool_script" ]; then
+          log warn "$tool" "script not executable"
+          continue
+        fi
+
+        # Check if tool has a status function/command
+        if grep -q "^status()" "$tool_script" 2>/dev/null; then
+          "${tool_script}" status 2>&1 || log warn "$tool" "status command failed"
+        else
+          # For tools without status function, just show if command exists
+          tool_cmd=$(echo "$tool" | tr '-' '_')
+          if command -v "$tool" >/dev/null 2>&1; then
+            log info "$tool" "installed (legacy script)"
+          elif command -v "$tool_cmd" >/dev/null 2>&1; then
+            log info "$tool_cmd" "installed (legacy script)"
+          else
+            log info "$tool" "not installed (legacy script)"
+          fi
+        fi
+      fi
+    done
+    return 0
+  fi
 
   tool_script="${DEV_HOME}/tools/${tool_name}.sh"
 
