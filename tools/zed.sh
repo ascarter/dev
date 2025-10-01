@@ -14,14 +14,20 @@ ZED_CHANNEL=${ZED_CHANNEL:-stable}
 . "$(dirname "$0")/../bin/devlog"
 
 install() {
+  local force_install="${1:-}"
+
   # Check if zed is already installed
-  if command -v zed >/dev/null 2>&1; then
+  if command -v zed >/dev/null 2>&1 && [ "$force_install" != "--force" ]; then
     log info "zed" "already installed, skipping"
     status
     return 0
   fi
 
-  log info "zed" "installing Zed editor (${ZED_CHANNEL} channel)"
+  if [ "$force_install" = "--force" ]; then
+    log info "zed" "reinstalling Zed editor (${ZED_CHANNEL} channel)"
+  else
+    log info "zed" "installing Zed editor (${ZED_CHANNEL} channel)"
+  fi
 
   # Install via official script
   if ! curl -fsSL https://zed.dev/install.sh | ZED_CHANNEL=$ZED_CHANNEL sh; then
@@ -29,7 +35,11 @@ install() {
     return 1
   fi
 
-  log info "zed" "installation complete"
+  if [ "$force_install" = "--force" ]; then
+    log info "zed" "reinstall complete"
+  else
+    log info "zed" "installation complete"
+  fi
 }
 
 update() {
@@ -40,13 +50,8 @@ update() {
 
   log info "zed" "Zed auto-updates itself, reinstalling to ensure latest"
 
-  # Zed auto-updates, but we can reinstall to ensure latest version
-  if ! curl -fsSL https://zed.dev/install.sh | ZED_CHANNEL=$ZED_CHANNEL sh; then
-    log error "zed" "update failed"
-    return 1
-  fi
-
-  log info "zed" "update complete"
+  # Call install with force flag to reinstall
+  install --force
 }
 
 uninstall() {
