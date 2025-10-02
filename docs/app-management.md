@@ -102,8 +102,7 @@ Each application is defined in a TOML section with an installer type and type-sp
 [helix]
 installer = "ubi"
 project = "helix-editor/helix"
-extract_all = true
-symlinks = ["hx:${XDG_BIN_HOME}/hx", "contrib/completion/hx.zsh:${XDG_DATA_HOME}/zsh/completions/_hx"]
+bin = ["hx"]
 status_cmd = "hx --version"
 ```
 
@@ -150,24 +149,60 @@ install_dir = "/Applications"     # Optional: override install location
 
 ### UBI Tools (Cross-platform)
 
-Simple tool (binary only):
+All UBI tools are extracted to `$XDG_DATA_HOME/<app_name>` for consistent installation and easy cleanup.
+
+Simple tool (single binary):
 ```toml
 [fd]
 installer = "ubi"
 project = "sharkdp/fd"
-# bin_name defaults to "fd" (section name)
-# install_dir defaults to "${XDG_BIN_HOME}"
+# bin defaults to ["fd"] (app name)
+# Installs to: $XDG_DATA_HOME/fd
+# Symlinks: $XDG_BIN_HOME/fd -> $XDG_DATA_HOME/fd/fd
 ```
 
-Complex tool (with runtime files):
+Tool with binary in subdirectory:
+```toml
+[gh]
+installer = "ubi"
+project = "cli/cli"
+bin = ["bin/gh"]
+# Installs to: $XDG_DATA_HOME/gh
+# Symlinks: $XDG_BIN_HOME/gh -> $XDG_DATA_HOME/gh/bin/gh
+```
+
+Tool with multiple binaries:
+```toml
+[fastfetch]
+installer = "ubi"
+project = "fastfetch-cli/fastfetch"
+bin = ["usr/bin/fastfetch", "usr/bin/flashfetch"]
+# Installs to: $XDG_DATA_HOME/fastfetch
+# Symlinks: $XDG_BIN_HOME/fastfetch -> $XDG_DATA_HOME/fastfetch/usr/bin/fastfetch
+#           $XDG_BIN_HOME/flashfetch -> $XDG_DATA_HOME/fastfetch/usr/bin/flashfetch
+```
+
+Tool with binary aliasing:
+```toml
+[example]
+installer = "ubi"
+project = "owner/repo"
+bin = ["my-tool-aarch64-darwin:mytool"]
+# Installs to: $XDG_DATA_HOME/example
+# Symlinks: $XDG_BIN_HOME/mytool -> $XDG_DATA_HOME/example/my-tool-aarch64-darwin
+# Note: Supports platform-specific binary detection (e.g., yq_darwin_arm64)
+```
+
+Tool with supplementary files (completions, man pages):
 ```toml
 [helix]
 installer = "ubi"
 project = "helix-editor/helix"
-extract_all = true
-# install_dir defaults to "${XDG_DATA_HOME}/helix" (uses section name)
-symlinks = ["hx:${XDG_BIN_HOME}/hx", "contrib/completion/hx.zsh:${XDG_DATA_HOME}/zsh/completions/_hx"]
-status_cmd = "hx --version"  # Binary name differs from section name
+bin = ["hx"]
+symlinks = ["contrib/completion/hx.zsh:${XDG_DATA_HOME}/zsh/completions/_hx"]
+# Installs to: $XDG_DATA_HOME/helix
+# Symlinks: $XDG_BIN_HOME/hx -> $XDG_DATA_HOME/helix/hx
+#           $XDG_DATA_HOME/zsh/completions/_hx -> $XDG_DATA_HOME/helix/contrib/completion/hx.zsh
 ```
 
 **Required fields:**
@@ -175,48 +210,24 @@ status_cmd = "hx --version"  # Binary name differs from section name
 - `project` - GitHub repository (owner/repo)
 
 **Optional fields:**
-- `bin_name` - Name of the binary (default: section name)
-  - Only needed when `extract_all = false` and binary name differs from section name
-  - When `extract_all = false`: Used by UBI to identify which binary to extract from archive
-  - When `extract_all = true`: Not needed - symlinks auto-detect platform-specific binaries
-- `extract_all` - Extract entire archive instead of just binary (default: `false`)
-- `install_dir` - Installation directory (smart defaults apply, see below)
-- `symlinks` - TOML array of "src:dest" pairs for creating symlinks
-  - Supports auto-detection of platform-specific binaries (e.g., `yq_darwin_arm64`, `yq_linux_amd64`)
-- `status_cmd` - Command to run for status checking (default: tries `<section_name> --version` then `<section_name> version`)
+- `bin` - Array of binaries to symlink to `$XDG_BIN_HOME` (default: `["<app_name>"]`)
+  - Format: `"relative/path/to/binary"` or `"path/to/binary:alias"`
+  - Paths are relative to `$XDG_DATA_HOME/<app_name>`
+  - Use `:alias` suffix to specify custom symlink name
+  - Supports auto-detection of platform-specific binaries (e.g., `yq_darwin_arm64`)
+- `symlinks` - Array of supplementary files to symlink (completions, man pages, etc.)
+  - Format: `"src:dest"` pairs with environment variable expansion
+  - Paths in `src` are relative to `$XDG_DATA_HOME/<app_name>`
+  - Paths in `dest` support `${XDG_DATA_HOME}`, `${XDG_BIN_HOME}`, etc.
+  - Also supports platform-specific binary detection
+- `status_cmd` - Command to run for status checking (default: tries `<primary_bin> --version` then `<primary_bin> version`)
 
-**Smart defaults:**
-- `bin_name`: Defaults to the section name (e.g., `[fd]` → `bin_name = "fd"`)
-  - Only specify when `extract_all = false` and binary name differs from section name
-  - When `extract_all = true`, use `status_cmd` instead of `bin_name`
-- `install_dir`:
-  - If `extract_all = true`: Defaults to `${XDG_DATA_HOME}/<section_name>`
-  - If `extract_all = false` or unset: Defaults to `${XDG_BIN_HOME}`
-  - You can override by explicitly setting `install_dir`
-- `status_cmd`: Defaults to trying `<section_name> --version` then `<section_name> version`
-  - Specify when binary name differs from section name or uses non-standard version command
-  - Set to empty string (`status_cmd = ""`) to skip version check
-</parameter>
-
-**Smart Binary Detection:**
-
-When using `extract_all = true`, archives often contain platform-specific binaries (e.g., `yq_darwin_arm64`, `tool_linux_amd64`). The symlink system automatically detects these:
-
-```toml
-[yq]
-installer = "ubi"
-project = "mikefarah/yq"
-extract_all = true
-# Symlink "yq" auto-detects yq_darwin_arm64, yq_linux_amd64, etc.
-symlinks = ["yq:${XDG_BIN_HOME}/yq", "yq.1:${XDG_DATA_HOME}/man/man1/yq.1"]
-```
-
-If the exact source file doesn't exist, the system looks for files matching `<name>_*` and uses the first match.
-
-**Environment variables in paths:**
-- `${XDG_BIN_HOME}` - User binaries (default: `~/.local/bin`)
-- `${XDG_DATA_HOME}` - User data (default: `~/.local/share`)
-- `${XDG_CONFIG_HOME}` - User config (default: `~/.config`)
+**Installation behavior:**
+- All tools extract to `$XDG_DATA_HOME/<app_name>` (dedicated directory per tool)
+- Binaries from `bin` array are symlinked to `$XDG_BIN_HOME`
+- Supplementary files from `symlinks` array are symlinked to specified destinations
+- Uninstall removes the entire `$XDG_DATA_HOME/<app_name>` directory and all symlinks
+- Use `dev doctor` to clean up orphaned symlinks
 
 ### Flatpak Applications (Linux)
 
@@ -383,6 +394,39 @@ dev app list
 dev app list --file custom.toml
 ```
 
+## Maintenance
+
+### dev doctor
+
+The `dev doctor` command checks the dev environment for issues and automatically repairs them.
+
+**Current checks:**
+- **Orphaned symlinks**: Finds and removes broken symlinks in `$XDG_BIN_HOME` that point to non-existent targets
+  - Common after uninstalling apps or switching between different app management systems
+  - Safe to run anytime - only removes dead symlinks
+
+```bash
+# Check and repair dev environment
+dev doctor
+```
+
+**Output example:**
+```
+doctor                     Checking dev environment health
+
+checking                   Orphaned symlinks in /Users/user/.local/bin
+orphaned symlink           old-tool -> /Users/user/.local/share/old-tool/bin/tool
+removed                    old-tool
+
+fixed                      1 orphaned symlink(s)
+```
+
+**Future checks** (potential additions):
+- Detect apps installed outside of manifests
+- Verify manifest integrity
+- Check for available updates
+- Validate symlink targets
+
 ## Examples
 
 ### Example: macOS Setup
@@ -393,15 +437,14 @@ dev app list --file custom.toml
 [helix]
 installer = "ubi"
 project = "helix-editor/helix"
-extract_all = true
-symlinks = ["hx:${XDG_BIN_HOME}/hx", "contrib/completion/hx.zsh:${XDG_DATA_HOME}/zsh/completions/_hx"]
+bin = ["hx"]
+symlinks = ["contrib/completion/hx.zsh:${XDG_DATA_HOME}/zsh/completions/_hx"]
 status_cmd = "hx --version"
 
 [gh]
 installer = "ubi"
 project = "cli/cli"
-extract_all = true
-symlinks = ["bin/gh:${XDG_BIN_HOME}/gh"]
+bin = ["bin/gh"]
 
 [fd]
 installer = "ubi"
@@ -446,14 +489,13 @@ project = "sharkdp/fd"
 [ripgrep]
 installer = "ubi"
 project = "BurntSushi/ripgrep"
-bin_name = "rg"
+bin = ["rg"]
 
 [yq]
 installer = "ubi"
 project = "mikefarah/yq"
-extract_all = true
+bin = ["yq"]
 # Auto-detects yq_linux_amd64 on Linux, yq_darwin_arm64 on macOS
-symlinks = ["yq:${XDG_BIN_HOME}/yq", "yq.1:${XDG_DATA_HOME}/man/man1/yq.1"]
 ```
 
 ```toml

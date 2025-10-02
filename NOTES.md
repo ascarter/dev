@@ -50,13 +50,15 @@ dev app list               # List all apps in manifests
 
 **Key Features:**
 - Multi-manifest support (cli.toml + platform-specific)
+- Consistent installation: All UBI tools extract to $XDG_DATA_HOME/<app>
+- Flexible bin symlinking with :alias support
 - Smart binary detection for platform-specific variants
-- Symlink management for completions and man pages
 - Idempotent installs (skip already-installed apps)
 - Update support with force reinstall
 - Self-update flag for apps with built-in update mechanisms
 - Smart defaults for shell and check_cmd
 - Flexible uninstall_cmd for custom uninstall logic
+- `dev doctor` command for environment health checks
 
 ### Bootstrap Dependencies
 **Two-stage installation pattern:**

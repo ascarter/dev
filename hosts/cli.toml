@@ -19,12 +19,10 @@
 [helix]
 installer = "ubi"
 project = "helix-editor/helix"
-extract_all = true
-symlinks = [
-  "hx:${XDG_BIN_HOME}/hx",
-  "contrib/completion/hx.zsh:${XDG_DATA_HOME}/zsh/completions/_hx"
-]
+bin = ["hx"]
+symlinks = ["contrib/completion/hx.zsh:${XDG_DATA_HOME}/zsh/completions/_hx"]
 status_cmd = "hx --version"
+# Note: Helix runtime is included in the extracted archive
 
 [marksman]
 installer = "ubi"
@@ -45,8 +43,7 @@ project = "tamasfe/taplo"
 [gh]
 installer = "ubi"
 project = "cli/cli"
-extract_all = true
-symlinks = ["bin/gh:${XDG_BIN_HOME}/gh"]
+bin = ["bin/gh"]
 
 [serie]
 installer = "ubi"
@@ -74,9 +71,8 @@ project = "openai/codex"
 [bat]
 installer = "ubi"
 project = "sharkdp/bat"
-extract_all = true
+bin = ["bat"]
 symlinks = [
-  "bat:${XDG_BIN_HOME}/bat",
   "bat.1:${XDG_DATA_HOME}/man/man1/bat.1",
   "autocomplete/bat.zsh:${XDG_DATA_HOME}/zsh/completions/_bat"
 ]
@@ -84,9 +80,8 @@ symlinks = [
 [fd]
 installer = "ubi"
 project = "sharkdp/fd"
-extract_all = true
+bin = ["fd"]
 symlinks = [
-  "fd:${XDG_BIN_HOME}/fd",
   "fd.1:${XDG_DATA_HOME}/man/man1/fd.1",
   "autocomplete/_fd:${XDG_DATA_HOME}/zsh/completions/_fd"
 ]
@@ -94,9 +89,8 @@ symlinks = [
 [ripgrep]
 installer = "ubi"
 project = "BurntSushi/ripgrep"
-extract_all = true
+bin = ["rg"]
 symlinks = [
-  "rg:${XDG_BIN_HOME}/rg",
   "doc/rg.1:${XDG_DATA_HOME}/man/man1/rg.1",
   "complete/_rg:${XDG_DATA_HOME}/zsh/completions/_rg"
 ]
@@ -113,11 +107,8 @@ project = "jqlang/jq"
 [yq]
 installer = "ubi"
 project = "mikefarah/yq"
-extract_all = true
-symlinks = [
-  "yq:${XDG_BIN_HOME}/yq",
-  "yq.1:${XDG_DATA_HOME}/man/man1/yq.1"
-]
+bin = ["yq"]
+symlinks = ["yq.1:${XDG_DATA_HOME}/man/man1/yq.1"]
 # Note: install.sh bootstraps yq binary-only for manifest parsing
 # This full install adds man pages and proper directory structure
 # Binary name is auto-detected (yq_darwin_arm64, yq_linux_amd64, etc.)
@@ -129,10 +120,8 @@ symlinks = [
 [fastfetch]
 installer = "ubi"
 project = "fastfetch-cli/fastfetch"
-extract_all = true
+bin = ["usr/bin/fastfetch", "usr/bin/flashfetch"]
 symlinks = [
-  "usr/bin/fastfetch:${XDG_BIN_HOME}/fastfetch",
-  "usr/bin/flashfetch:${XDG_BIN_HOME}/flashfetch",
   "usr/share/man/man1/fastfetch.1:${XDG_DATA_HOME}/man/man1/fastfetch.1",
   "usr/share/zsh/site-functions/_fastfetch:${XDG_DATA_HOME}/zsh/completions/_fastfetch"
 ]

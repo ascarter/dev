@@ -3,16 +3,21 @@
 # ubi.sh - UBI (Universal Binary Installer) backend for app management
 #
 # This library provides functions for installing CLI tools from GitHub releases
-# using ubi. It is designed to be sourced by the main app.sh module.
+# using ubi. All installations go to $XDG_DATA_HOME/<app> for consistency.
 #
 # Functions:
-#   ubi_install <project> <bin_name> <install_dir> [extract_all] [symlinks]
-#   ubi_uninstall <install_dir> <bin_name> [symlinks]
-#   ubi_status <install_dir> <bin_name> <extract_all> [status_cmd]
+#   ubi_install <app_name> <project> <bin> <symlinks> [force]
+#   ubi_uninstall <app_name> <bin> <symlinks>
+#   ubi_status <app_name> <bin> [status_cmd]
+#   ubi_update <app_name> <project> <bin> <symlinks>
 #
 # Notes:
-#   - bin_name: Only needed when extract_all=false and binary name differs from section name
-#   - status_cmd: Use when binary name differs from section name or for non-standard version commands
+#   - All tools extract to $XDG_DATA_HOME/<app_name>
+#   - bin is an array of binaries to symlink to $XDG_BIN_HOME
+#   - bin format: "relative/path/to/binary" or "path/to/binary:alias"
+#   - Default bin: ["<app_name>"] (symlinks <app_name> from root to $XDG_BIN_HOME/<app_name>)
+#   - symlinks is for supplementary files (man pages, completions, etc.)
+#   - symlinks format: "src:dest" with environment variable expansion
 #
 # Dependencies:
 #   - ubi (Universal Binary Installer)
@@ -29,77 +34,127 @@ ubi_check_deps() {
 
 # Install tool using ubi
 # Args:
-#   $1 - GitHub project (e.g., "sharkdp/fd")
-#   $2 - Binary name (e.g., "fd") - only used by UBI when extract_all=false
-#   $3 - Install directory (e.g., "${XDG_BIN_HOME}")
-#   $4 - Extract all flag ("true" or "false", default: "false")
-#   $5 - Symlinks (newline-separated "src:dest" pairs from TOML array)
-#   $6 - Force reinstall ("true" to skip already-installed check)
+#   $1 - App name (used for install directory)
+#   $2 - GitHub project (e.g., "sharkdp/fd")
+#   $3 - Bin array (newline-separated binary paths, optional :alias suffix)
+#   $4 - Symlinks (newline-separated "src:dest" pairs for supplementary files)
+#   $5 - Force reinstall ("true" to skip already-installed check)
 ubi_install() {
-  local project="$1"
-  local bin_name="$2"
-  local install_dir="$3"
-  local extract_all="${4:-false}"
-  local symlinks="${5:-}"
-  local force="${6:-false}"
+  local app_name="$1"
+  local project="$2"
+  local bin="${3:-}"
+  local symlinks="${4:-}"
+  local force="${5:-false}"
 
   # Check dependencies
   if ! ubi_check_deps; then
     return 1
   fi
 
-  # Expand environment variables in install_dir
-  install_dir=$(eval echo "$install_dir")
+  # Set install directory to $XDG_DATA_HOME/<app_name>
+  local install_dir="${XDG_DATA_HOME}/${app_name}"
 
   # Check if already installed (unless forced)
-  if [ "$force" != "true" ]; then
-    if [ "$extract_all" = "true" ]; then
-      # For extract_all, just check if the install directory exists
-      if [ -d "$install_dir" ]; then
-        log info "$bin_name" "already installed, skipping"
-        return 0
-      fi
-    else
-      # For single binary, check if the binary file exists
-      local bin_path="${install_dir}/${bin_name}"
-      if [ -f "$bin_path" ] || [ -L "$bin_path" ]; then
-        log info "$bin_name" "already installed, skipping"
-        return 0
-      fi
-    fi
+  if [ "$force" != "true" ] && [ -d "$install_dir" ]; then
+    log info "already installed" "skipping installation"
+    return 0
   fi
 
   # Create install directory
   mkdir -p "$install_dir"
 
-  log info "installing" "$bin_name from $project"
+  log info "installing" "$app_name from $project"
 
-  # Build ubi command
-  local ubi_cmd="ubi --project \"$project\" --in \"$install_dir\""
-
-  if [ "$extract_all" = "true" ]; then
-    ubi_cmd="${ubi_cmd} --extract-all"
-  else
-    # For single binary mode, specify the executable name
-    ubi_cmd="${ubi_cmd} --exe \"$bin_name\""
-  fi
-
-  # Execute ubi
-  if ! eval "$ubi_cmd"; then
-    log error "installation failed" "$bin_name"
+  # Always use --extract-all to get full release contents
+  if ! ubi --project "$project" --in "$install_dir" --extract-all; then
+    log error "installation failed" "$app_name"
     return 1
   fi
 
-  # Handle symlinks if specified
+  # Handle bin symlinks
+  # Default: if no bin specified, symlink <app_name> from root to $XDG_BIN_HOME/<app_name>
+  if [ -z "$bin" ]; then
+    bin="$app_name"
+  fi
+
+  ubi_create_bin_symlinks "$app_name" "$install_dir" "$bin"
+
+  # Handle supplementary symlinks (man pages, completions, etc.)
   if [ -n "$symlinks" ]; then
     ubi_create_symlinks "$install_dir" "$symlinks"
   fi
 
-  log info "installed" "$bin_name"
+  log info "installed" "$app_name"
   return 0
 }
 
-# Create symlinks for installed tool
+# Create bin symlinks for installed tool
+# Args:
+#   $1 - App name (for logging)
+#   $2 - Install directory
+#   $3 - Newline-separated binary definitions (path or path:alias)
+ubi_create_bin_symlinks() {
+  local app_name="$1"
+  local install_dir="$2"
+  local bin_defs="$3"
+
+  # Parse binary definitions
+  printf '%s\n' "$bin_defs" | while IFS= read -r bin_def; do
+    [ -z "$bin_def" ] && continue
+
+    # Parse path:alias format
+    local src_path dest_name
+    if echo "$bin_def" | grep -q ':'; then
+      src_path="${bin_def%%:*}"
+      dest_name="${bin_def##*:}"
+    else
+      src_path="$bin_def"
+      dest_name=$(basename "$bin_def")
+    fi
+
+    # Make source path absolute
+    local src="${install_dir}/${src_path}"
+
+    # Smart binary detection for platform-specific variants
+    # If exact source doesn't exist, look for platform-specific variant (e.g., yq_darwin_arm64)
+    if [ ! -e "$src" ]; then
+      local src_base
+      src_base=$(basename "$src")
+      local src_dir
+      src_dir=$(dirname "$src")
+
+      # Look for files matching pattern: basename_* (platform-specific binaries)
+      local matched_file
+      matched_file=$(find "$src_dir" -maxdepth 1 -type f -name "${src_base}_*" 2>/dev/null | head -1)
+
+      if [ -n "$matched_file" ] && [ -f "$matched_file" ]; then
+        src="$matched_file"
+        log info "auto-detected" "$(basename "$src") for $dest_name"
+      fi
+    fi
+
+    # Destination is always in $XDG_BIN_HOME
+    local dest="${XDG_BIN_HOME}/${dest_name}"
+
+    # Create destination directory if needed
+    mkdir -p "$XDG_BIN_HOME"
+
+    # Remove existing symlink or file
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+      rm -f "$dest"
+    fi
+
+    # Create symlink
+    if [ -e "$src" ]; then
+      ln -s "$src" "$dest"
+      log info "symlink created" "$dest_name -> $(basename "$src")"
+    else
+      log warn "binary not found" "$src_path"
+    fi
+  done
+}
+
+# Create supplementary symlinks (man pages, completions, etc.)
 # Args:
 #   $1 - Base directory
 #   $2 - Newline-separated "src:dest" pairs
@@ -164,20 +219,42 @@ ubi_create_symlinks() {
 
 # Uninstall tool
 # Args:
-#   $1 - Install directory
-#   $2 - Binary name
-#   $3 - Symlinks (newline-separated "src:dest" pairs from TOML array)
+#   $1 - App name
+#   $2 - Bin array (newline-separated binary definitions)
+#   $3 - Symlinks (newline-separated "src:dest" pairs)
 ubi_uninstall() {
-  local install_dir="$1"
-  local bin_name="$2"
+  local app_name="$1"
+  local bin="${2:-}"
   local symlinks="${3:-}"
 
-  # Expand environment variables
-  install_dir=$(eval echo "$install_dir")
+  local install_dir="${XDG_DATA_HOME}/${app_name}"
 
-  log info "uninstalling" "$bin_name"
+  log info "uninstalling" "$app_name"
 
-  # Remove symlinks first
+  # Remove bin symlinks
+  if [ -z "$bin" ]; then
+    bin="$app_name"
+  fi
+
+  printf '%s\n' "$bin" | while IFS= read -r bin_def; do
+    [ -z "$bin_def" ] && continue
+
+    # Parse path:alias format to get destination name
+    local dest_name
+    if echo "$bin_def" | grep -q ':'; then
+      dest_name="${bin_def##*:}"
+    else
+      dest_name=$(basename "$bin_def")
+    fi
+
+    local dest="${XDG_BIN_HOME}/${dest_name}"
+    if [ -L "$dest" ] || [ -e "$dest" ]; then
+      rm -f "$dest"
+      log info "removed symlink" "$dest_name"
+    fi
+  done
+
+  # Remove supplementary symlinks
   if [ -n "$symlinks" ]; then
     printf '%s\n' "$symlinks" | while IFS= read -r link_def; do
       [ -z "$link_def" ] && continue
@@ -191,93 +268,75 @@ ubi_uninstall() {
     done
   fi
 
-  # Remove installation directory or binary
+  # Remove installation directory
   if [ -d "$install_dir" ]; then
-    # Check if this looks like a dedicated tool directory
-    # (e.g., ~/.local/share/helix) vs a shared bin directory
-    local parent_name
-    parent_name=$(basename "$install_dir")
-
-    # If directory name matches tool name, remove entire directory
-    if [ "$parent_name" = "$bin_name" ] || [ -d "${install_dir}/runtime" ]; then
-      rm -rf "$install_dir"
-      log info "removed directory" "$install_dir"
-    else
-      # Shared directory - just remove the binary
-      local bin_path="${install_dir}/${bin_name}"
-      if [ -f "$bin_path" ]; then
-        rm -f "$bin_path"
-        log info "removed binary" "$bin_path"
-      fi
-    fi
+    rm -rf "$install_dir"
+    log info "removed directory" "$install_dir"
   fi
 
-  log info "uninstalled" "$bin_name"
+  log info "uninstalled" "$app_name"
   return 0
 }
 
 # Get status of installed tool
 # Args:
-#   $1 - Install directory
-#   $2 - Binary name (used for default status_cmd if not specified)
-#   $3 - Extract all flag ("true" or "false")
-#   $4 - Status command (optional, defaults to "<bin_name> --version" or "<bin_name> version")
-# Notes:
-#   - For extract_all=true: Checks if install directory exists
-#   - For extract_all=false: Checks if binary file exists in shared directory
-#   - status_cmd overrides default version checking commands
+#   $1 - App name
+#   $2 - Bin array (for determining primary binary)
+#   $3 - Status command (optional, defaults to "<primary_bin> --version" or "<primary_bin> version")
 ubi_status() {
-  local install_dir="$1"
-  local bin_name="$2"
-  local extract_all="${3:-false}"
-  local status_cmd="${4:-}"
+  local app_name="$1"
+  local bin="${2:-}"
+  local status_cmd="${3:-}"
 
-  # Expand environment variables
-  install_dir=$(eval echo "$install_dir")
+  local install_dir="${XDG_DATA_HOME}/${app_name}"
 
-  # Check if tool is installed
-  # For extract_all=true, check if the install directory exists (dedicated dir)
-  # For extract_all=false, check if the binary exists in the shared directory
-  if [ "$extract_all" = "true" ]; then
-    if [ ! -d "$install_dir" ]; then
-      log_status "$bin_name" "ubi" "not installed" "warn"
-      return 0
-    fi
+  # Check if installed
+  if [ ! -d "$install_dir" ]; then
+    log_status "$app_name" "ubi" "not installed" "warn"
+    return 0
+  fi
+
+  # Determine primary binary (first in bin array)
+  local primary_bin
+  if [ -z "$bin" ]; then
+    primary_bin="$app_name"
   else
-    local bin_path="${install_dir}/${bin_name}"
-    if [ ! -f "$bin_path" ] && [ ! -L "$bin_path" ]; then
-      log_status "$bin_name" "ubi" "not installed" "warn"
-      return 0
+    local first_bin
+    first_bin=$(printf '%s\n' "$bin" | head -1)
+    if echo "$first_bin" | grep -q ':'; then
+      primary_bin="${first_bin##*:}"
+    else
+      primary_bin=$(basename "$first_bin")
     fi
   fi
 
   # Determine status command
   if [ -z "$status_cmd" ]; then
     # Try default commands
-    if command -v "$bin_name" >/dev/null 2>&1; then
+    if command -v "$primary_bin" >/dev/null 2>&1; then
       # Try --version first
-      if output=$("$bin_name" --version 2>&1 | head -1) && [ -n "$output" ]; then
-        log_status "$bin_name" "ubi" "$output"
+      if output=$("$primary_bin" --version 2>&1 | head -1) && [ -n "$output" ]; then
+        log_status "$app_name" "ubi" "$output"
         return 0
       # Try version second
-      elif output=$("$bin_name" version 2>&1 | head -1) && [ -n "$output" ]; then
-        log_status "$bin_name" "ubi" "$output"
+      elif output=$("$primary_bin" version 2>&1 | head -1) && [ -n "$output" ]; then
+        log_status "$app_name" "ubi" "$output"
         return 0
       else
-        log_status "$bin_name" "ubi" "installed"
+        log_status "$app_name" "ubi" "installed"
         return 0
       fi
     else
-      log_status "$bin_name" "ubi" "not in PATH" "error"
+      log_status "$app_name" "ubi" "not in PATH" "error"
       return 1
     fi
   else
     # Use custom status command
     if output=$(eval "$status_cmd" 2>&1 | head -1) && [ -n "$output" ]; then
-      log_status "$bin_name" "ubi" "$output"
+      log_status "$app_name" "ubi" "$output"
       return 0
     else
-      log_status "$bin_name" "ubi" "status check failed" "error"
+      log_status "$app_name" "ubi" "status check failed" "error"
       return 1
     fi
   fi
@@ -286,7 +345,7 @@ ubi_status() {
 # Update tool (reinstall)
 # Args: same as ubi_install (but force=true is added)
 ubi_update() {
-  log info "updating" "$2"
-  # Call install with force=true (6th parameter)
-  ubi_install "$1" "$2" "$3" "$4" "$5" "true"
+  log info "updating" "$1"
+  # Call install with force=true (5th parameter)
+  ubi_install "$1" "$2" "$3" "$4" "true"
 }

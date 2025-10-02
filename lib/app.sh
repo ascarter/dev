@@ -197,11 +197,9 @@ app_install_ubi() {
   local manifest="$1"
   local app_name="$2"
 
-  local project bin_name install_dir extract_all symlinks
+  local project bin symlinks
   project=$(app_get_config "$manifest" "$app_name" "project")
-  bin_name=$(app_get_config "$manifest" "$app_name" "bin_name")
-  install_dir=$(app_get_config "$manifest" "$app_name" "install_dir")
-  extract_all=$(app_get_config "$manifest" "$app_name" "extract_all")
+  bin=$(app_get_config "$manifest" "$app_name" "bin")
   symlinks=$(app_get_config "$manifest" "$app_name" "symlinks")
 
   # Validate required fields
@@ -210,29 +208,8 @@ app_install_ubi() {
     return 1
   fi
 
-  # Default bin_name to app_name if not specified
-  if [ -z "$bin_name" ]; then
-    bin_name="$app_name"
-  fi
-
-  # Default extract_all
-  if [ -z "$extract_all" ]; then
-    extract_all="false"
-  fi
-
-  # Smart default for install directory based on extract_all
-  if [ -z "$install_dir" ]; then
-    if [ "$extract_all" = "true" ]; then
-      # For extract_all, use dedicated directory in XDG_DATA_HOME based on app name
-      install_dir="${XDG_DATA_HOME}/${app_name}"
-    else
-      # For single binary, use XDG_BIN_HOME
-      install_dir="${XDG_BIN_HOME}"
-    fi
-  fi
-
-  # Install using ubi backend
-  ubi_install "$project" "$bin_name" "$install_dir" "$extract_all" "$symlinks"
+  # Install using ubi backend (always extracts to $XDG_DATA_HOME/<app_name>)
+  ubi_install "$app_name" "$project" "$bin" "$symlinks"
 }
 
 # Update UBI-based tool
@@ -240,11 +217,9 @@ app_update_ubi() {
   local manifest="$1"
   local app_name="$2"
 
-  local project bin_name install_dir extract_all symlinks
+  local project bin symlinks
   project=$(app_get_config "$manifest" "$app_name" "project")
-  bin_name=$(app_get_config "$manifest" "$app_name" "bin_name")
-  install_dir=$(app_get_config "$manifest" "$app_name" "install_dir")
-  extract_all=$(app_get_config "$manifest" "$app_name" "extract_all")
+  bin=$(app_get_config "$manifest" "$app_name" "bin")
   symlinks=$(app_get_config "$manifest" "$app_name" "symlinks")
 
   # Validate required fields
@@ -253,29 +228,8 @@ app_update_ubi() {
     return 1
   fi
 
-  # Default bin_name to app_name if not specified
-  if [ -z "$bin_name" ]; then
-    bin_name="$app_name"
-  fi
-
-  # Default extract_all
-  if [ -z "$extract_all" ]; then
-    extract_all="false"
-  fi
-
-  # Smart default for install directory based on extract_all
-  if [ -z "$install_dir" ]; then
-    if [ "$extract_all" = "true" ]; then
-      # For extract_all, use dedicated directory in XDG_DATA_HOME based on app name
-      install_dir="${XDG_DATA_HOME}/${app_name}"
-    else
-      # For single binary, use XDG_BIN_HOME
-      install_dir="${XDG_BIN_HOME}"
-    fi
-  fi
-
   # Update using ubi backend
-  ubi_update "$project" "$bin_name" "$install_dir" "$extract_all" "$symlinks"
+  ubi_update "$app_name" "$project" "$bin" "$symlinks"
 }
 
 # Update curl-based application
@@ -430,34 +384,11 @@ app_uninstall_ubi() {
   local manifest="$1"
   local app_name="$2"
 
-  local bin_name install_dir extract_all symlinks
-  bin_name=$(app_get_config "$manifest" "$app_name" "bin_name")
-  install_dir=$(app_get_config "$manifest" "$app_name" "install_dir")
-  extract_all=$(app_get_config "$manifest" "$app_name" "extract_all")
+  local bin symlinks
+  bin=$(app_get_config "$manifest" "$app_name" "bin")
   symlinks=$(app_get_config "$manifest" "$app_name" "symlinks")
 
-  # Default bin_name to app_name if not specified
-  if [ -z "$bin_name" ]; then
-    bin_name="$app_name"
-  fi
-
-  # Default extract_all
-  if [ -z "$extract_all" ]; then
-    extract_all="false"
-  fi
-
-  # Smart default for install directory based on extract_all
-  if [ -z "$install_dir" ]; then
-    if [ "$extract_all" = "true" ]; then
-      # For extract_all, use dedicated directory in XDG_DATA_HOME based on app name
-      install_dir="${XDG_DATA_HOME}/${app_name}"
-    else
-      # For single binary, use XDG_BIN_HOME
-      install_dir="${XDG_BIN_HOME}"
-    fi
-  fi
-
-  ubi_uninstall "$install_dir" "$bin_name" "$symlinks"
+  ubi_uninstall "$app_name" "$bin" "$symlinks"
 }
 
 # Uninstall Flatpak application
@@ -560,34 +491,11 @@ app_status_ubi() {
   local manifest="$1"
   local app_name="$2"
 
-  local bin_name install_dir extract_all status_cmd
-  bin_name=$(app_get_config "$manifest" "$app_name" "bin_name")
-  install_dir=$(app_get_config "$manifest" "$app_name" "install_dir")
-  extract_all=$(app_get_config "$manifest" "$app_name" "extract_all")
+  local bin status_cmd
+  bin=$(app_get_config "$manifest" "$app_name" "bin")
   status_cmd=$(app_get_config "$manifest" "$app_name" "status_cmd")
 
-  # Default bin_name to app_name if not specified
-  if [ -z "$bin_name" ]; then
-    bin_name="$app_name"
-  fi
-
-  # Default extract_all
-  if [ -z "$extract_all" ]; then
-    extract_all="false"
-  fi
-
-  # Smart default for install directory based on extract_all
-  if [ -z "$install_dir" ]; then
-    if [ "$extract_all" = "true" ]; then
-      # For extract_all, use dedicated directory in XDG_DATA_HOME based on app name
-      install_dir="${XDG_DATA_HOME}/${app_name}"
-    else
-      # For single binary, use XDG_BIN_HOME
-      install_dir="${XDG_BIN_HOME}"
-    fi
-  fi
-
-  ubi_status "$install_dir" "$bin_name" "$extract_all" "$status_cmd"
+  ubi_status "$app_name" "$bin" "$status_cmd"
 }
 
 # Get status of Flatpak application

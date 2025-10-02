@@ -55,6 +55,7 @@ usage() {
   log "  app <action> [name]" "Manage applications (install|uninstall|status|update|list)"
   log "  tool [name] [action]" "Manage tool installation"
   log "  script [name] [-- args]" "Run utility script"
+  log "  doctor" "Check and repair dev environment"
   log ""
   usage_options
   log "  -h" "Show help"
@@ -496,6 +497,46 @@ cmd_script() {
   sh "${script_path}" $script_args
 }
 
+cmd_doctor() {
+  log "doctor" "Checking dev environment health"
+  log ""
+
+  local issues_found=0
+  local fixed_count=0
+
+  # Check for orphaned symlinks in XDG_BIN_HOME
+  if [ -d "$XDG_BIN_HOME" ]; then
+    log "checking" "Orphaned symlinks in $XDG_BIN_HOME"
+
+    for link in "$XDG_BIN_HOME"/*; do
+      # Skip if not a symlink
+      [ -L "$link" ] || continue
+
+      # Check if target exists
+      if [ ! -e "$link" ]; then
+        issues_found=$((issues_found + 1))
+        local link_name=$(basename "$link")
+        local link_target=$(readlink "$link")
+
+        log "orphaned symlink" "$link_name -> $link_target"
+
+        # Remove orphaned symlink
+        rm -f "$link"
+        fixed_count=$((fixed_count + 1))
+        log "removed" "$link_name"
+      fi
+    done
+  fi
+
+  # Summary
+  log ""
+  if [ $issues_found -eq 0 ]; then
+    log "healthy" "No issues found"
+  else
+    log "fixed" "$fixed_count orphaned symlink(s)"
+  fi
+}
+
 # ------------------------------
 # Main
 # ------------------------------
@@ -551,6 +592,9 @@ app)
   ;;
 script)
   cmd_script "$@"
+  ;;
+doctor)
+  cmd_doctor "$@"
   ;;
 *)
   if [ -n "$command" ]; then
