@@ -19,6 +19,7 @@
 #   - dmg: macOS DMG installers
 #   - ubi: GitHub releases via Universal Binary Installer
 #   - flatpak: Linux applications via Flatpak
+#   - curl: Curl-piped install scripts
 
 # Ensure DEV_HOME is set
 if [ -z "${DEV_HOME:-}" ]; then
@@ -30,6 +31,7 @@ fi
 . "${DEV_HOME}/lib/app/dmg.sh"
 . "${DEV_HOME}/lib/app/ubi.sh"
 . "${DEV_HOME}/lib/app/flatpak.sh"
+. "${DEV_HOME}/lib/app/curl.sh"
 
 # Default values
 XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
@@ -142,6 +144,9 @@ app_install_one() {
     ;;
   flatpak)
     app_install_flatpak "$manifest" "$app_name"
+    ;;
+  curl)
+    app_install_curl "$manifest" "$app_name"
     ;;
   *)
     log error "unknown installer" "$installer"
@@ -273,6 +278,34 @@ app_update_ubi() {
   ubi_update "$project" "$bin_name" "$install_dir" "$extract_all" "$symlinks"
 }
 
+# Update curl-based application
+app_update_curl() {
+  local manifest="$1"
+  local app_name="$2"
+
+  local url shell env_vars args check_cmd update_cmd
+  url=$(app_get_config "$manifest" "$app_name" "url")
+  shell=$(app_get_config "$manifest" "$app_name" "shell")
+  env_vars=$(app_get_config "$manifest" "$app_name" "env")
+  args=$(app_get_config "$manifest" "$app_name" "args")
+  check_cmd=$(app_get_config "$manifest" "$app_name" "check_cmd")
+  update_cmd=$(app_get_config "$manifest" "$app_name" "update_cmd")
+
+  # Validate required fields
+  if [ -z "$url" ]; then
+    log error "missing config" "url is required for curl installer"
+    return 1
+  fi
+
+  # Default shell
+  if [ -z "$shell" ]; then
+    shell="sh"
+  fi
+
+  # Update using curl backend
+  curl_update "$app_name" "$check_cmd" "$update_cmd" "$url" "$shell" "$env_vars" "$args"
+}
+
 # Install Flatpak application
 app_install_flatpak() {
   local manifest="$1"
@@ -295,6 +328,34 @@ app_install_flatpak() {
 
   # Install using flatpak backend
   flatpak_install "$app_id" "$remote"
+}
+
+# Install curl-based application
+app_install_curl() {
+  local manifest="$1"
+  local app_name="$2"
+
+  local url shell env_vars args check_cmd update_cmd
+  url=$(app_get_config "$manifest" "$app_name" "url")
+  shell=$(app_get_config "$manifest" "$app_name" "shell")
+  env_vars=$(app_get_config "$manifest" "$app_name" "env")
+  args=$(app_get_config "$manifest" "$app_name" "args")
+  check_cmd=$(app_get_config "$manifest" "$app_name" "check_cmd")
+  update_cmd=$(app_get_config "$manifest" "$app_name" "update_cmd")
+
+  # Validate required fields
+  if [ -z "$url" ]; then
+    log error "missing config" "url is required for curl installer"
+    return 1
+  fi
+
+  # Default shell
+  if [ -z "$shell" ]; then
+    shell="sh"
+  fi
+
+  # Install using curl backend
+  curl_install "$app_name" "$url" "$shell" "$env_vars" "$args" "$check_cmd" "$update_cmd"
 }
 
 # Uninstall a single app
@@ -323,6 +384,9 @@ app_uninstall_one() {
     ;;
   flatpak)
     app_uninstall_flatpak "$manifest" "$app_name"
+    ;;
+  curl)
+    app_uninstall_curl "$manifest" "$app_name"
     ;;
   *)
     log error "unknown installer" "$installer"
@@ -413,6 +477,18 @@ app_uninstall_flatpak() {
   flatpak_uninstall "$app_id"
 }
 
+# Uninstall curl-based application
+app_uninstall_curl() {
+  local manifest="$1"
+  local app_name="$2"
+
+  local uninstall_cmd check_cmd
+  uninstall_cmd=$(app_get_config "$manifest" "$app_name" "uninstall_cmd")
+  check_cmd=$(app_get_config "$manifest" "$app_name" "check_cmd")
+
+  curl_uninstall "$app_name" "$uninstall_cmd" "$check_cmd"
+}
+
 # Get status of a single app
 app_status_one() {
   local manifest="$1"
@@ -437,6 +513,9 @@ app_status_one() {
     ;;
   flatpak)
     app_status_flatpak "$manifest" "$app_name"
+    ;;
+  curl)
+    app_status_curl "$manifest" "$app_name"
     ;;
   *)
     log error "unknown installer" "$installer"
@@ -528,6 +607,17 @@ app_status_flatpak() {
   flatpak_status "$app_id"
 }
 
+# Get status of curl-based application
+app_status_curl() {
+  local manifest="$1"
+  local app_name="$2"
+
+  local check_cmd
+  check_cmd=$(app_get_config "$manifest" "$app_name" "check_cmd")
+
+  curl_status "$app_name" "$check_cmd"
+}
+
 # Update a single app
 app_update_one() {
   local manifest="$1"
@@ -544,11 +634,11 @@ app_update_one() {
     return 1
   fi
 
-  # Check if app supports auto-update
-  local auto_update
-  auto_update=$(app_get_config "$manifest" "$app_name" "auto_update")
-  if [ "$auto_update" = "true" ]; then
-    log info "auto-update" "App has built-in auto-update, skipping"
+  # Check if app has self-update mechanism
+  local self_update
+  self_update=$(app_get_config "$manifest" "$app_name" "self_update")
+  if [ "$self_update" = "true" ]; then
+    log info "self-update" "Use the app's built-in update mechanism"
     return 0
   fi
 
@@ -569,6 +659,9 @@ app_update_one() {
       log error "missing config" "app_id is required"
       return 1
     fi
+    ;;
+  curl)
+    app_update_curl "$manifest" "$app_name"
     ;;
   *)
     log error "unknown installer" "$installer"

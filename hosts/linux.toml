@@ -4,6 +4,7 @@
 # CLI tools shared across platforms are defined in cli.toml.
 #
 # Supported installer types:
+#   - curl: Curl-piped install scripts
 #   - flatpak: Linux GUI applications from Flathub
 #
 # Usage:
@@ -11,6 +12,17 @@
 #   dev app install --all
 #   dev app status --all
 #   dev app update --all
+
+# =============================================================================
+# GUI Applications (Curl)
+# =============================================================================
+
+[zed]
+installer = "curl"
+url = "https://zed.dev/install.sh"
+self_update = true  # Use Zed > Check for Updates
+uninstall_cmd = "rm -rf ~/.local/zed.app ~/.local/bin/zed"
+# Note: Zed installs to ~/.local/zed.app and symlinks CLI to ~/.local/bin/zed
 
 # =============================================================================
 # GUI Applications (Flatpak)

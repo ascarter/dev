@@ -1,6 +1,6 @@
 # Development Notes
 
-## Current Status (2025-10-01)
+## Current Status (2025-10-02)
 
 The `dev` system is fully functional with all core features implemented.
 
@@ -11,7 +11,7 @@ The `dev` system is fully functional with all core features implemented.
 - ✅ Host provisioning (fully idempotent macos/fedora/ubuntu)
 - ✅ Tools system (11 tools with install/update/uninstall/status)
 - ✅ Scripts system (10 utility/config scripts)
-- ✅ Application management (manifest-based with UBI/DMG/Flatpak backends)
+- ✅ Application management (manifest-based with UBI/DMG/Flatpak/Curl backends)
 - ✅ Logging library (sourceable lib/log.sh for performance)
 - ✅ Documentation (app-management.md, bootstrap.md)
 
@@ -25,16 +25,19 @@ The `dev` system is fully functional with all core features implemented.
 - `tools/gh.sh` → `hosts/cli.toml`
 - `tools/codex.sh` → `hosts/cli.toml`
 - `tools/cosign.sh` → `hosts/cli.toml`
+- `tools/claude.sh` → `hosts/cli.toml`
+- `tools/zed.sh` → `hosts/macos.toml` + `hosts/linux.toml`
 
 **New Components:**
 - `lib/app.sh` - Main app management module
 - `lib/app/ubi.sh` - UBI installer backend with symlink management
 - `lib/app/dmg.sh` - DMG installer backend for macOS
 - `lib/app/flatpak.sh` - Flatpak installer backend for Linux
+- `lib/app/curl.sh` - Curl installer backend for curl-piped install scripts
 - `lib/toml.sh` - Shell-based TOML parser (fallback)
 - `hosts/cli.toml` - Cross-platform CLI tools manifest (20+ tools)
-- `hosts/macos.toml` - macOS-specific apps (DMG installers)
-- `hosts/linux.toml` - Linux-specific apps (Flatpak)
+- `hosts/macos.toml` - macOS-specific apps (DMG, Curl installers)
+- `hosts/linux.toml` - Linux-specific apps (Flatpak, Curl installers)
 
 **Commands:**
 ```bash
@@ -51,6 +54,9 @@ dev app list               # List all apps in manifests
 - Symlink management for completions and man pages
 - Idempotent installs (skip already-installed apps)
 - Update support with force reinstall
+- Self-update flag for apps with built-in update mechanisms
+- Smart defaults for shell and check_cmd
+- Flexible uninstall_cmd for custom uninstall logic
 
 ### Bootstrap Dependencies
 **Two-stage installation pattern:**

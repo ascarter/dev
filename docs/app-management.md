@@ -56,6 +56,12 @@ dev app uninstall ghostty
 - **Features:** Sandboxed apps, automatic updates, desktop integration
 - **Platform:** Linux only
 
+### Curl (Cross-platform)
+- **Use for:** Tools with official curl-piped install scripts
+- **Features:** Runs official installer scripts, supports self-update commands, custom environment variables
+- **Platform:** Cross-platform (macOS, Linux)
+- **Examples:** claude, zed
+
 ## Manifest Files
 
 Manifest files are located in `hosts/`:
@@ -126,7 +132,7 @@ installer = "dmg"
 url = "https://ghostty.org/download"
 app = "Ghostty.app"
 team_id = "24VZTF6M5V"           # Optional: verify code signature
-auto_update = true                # Optional: skip updates if app has built-in auto-update
+self_update = true                # Optional: app has built-in update mechanism
 user = false                      # Optional: install to ~/Applications instead of /Applications
 install_dir = "/Applications"     # Optional: override install location
 ```
@@ -138,7 +144,7 @@ install_dir = "/Applications"     # Optional: override install location
 
 **Optional fields:**
 - `team_id` - Apple Developer Team ID for signature verification
-- `auto_update` - Set to `true` if app has built-in auto-update
+- `self_update` - Set to `true` if app has built-in update mechanism (UI-based)
 - `user` - Set to `true` to install in `~/Applications`
 - `install_dir` - Override default installation directory
 
@@ -228,6 +234,71 @@ remote = "flathub"
 **Optional fields:**
 - `remote` - Flatpak remote (default: "flathub")
 
+### Curl-based Tools (Cross-platform)
+
+Simple tool (with CLI update command):
+```toml
+[claude]
+installer = "curl"
+url = "https://claude.ai/install.sh"
+shell = "bash"  # Claude's installer requires bash
+update_cmd = "claude update"
+uninstall_method = "manual"
+```
+
+Tool with UI-based updates:
+```toml
+[zed]
+installer = "curl"
+url = "https://zed.dev/install.sh"
+self_update = true  # Use Zed > Check for Updates
+uninstall_method = "manual"
+# Note: shell defaults to "sh", check_cmd defaults to "zed --version"
+```
+
+**Required fields:**
+- `installer` - Must be "curl"
+- `url` - URL to the install script
+
+**Optional fields:**
+- `shell` - Shell to pipe installer to (bash, sh, zsh; default: "sh")
+- `env` - Array of environment variables in "KEY=value" format
+- `args` - Arguments to pass to installer script
+- `check_cmd` - Command to verify installation (default: tries `<app_name> --version` then `<app_name> version`)
+- `update_cmd` - CLI command for updates (e.g., "claude update")
+- `self_update` - Set to `true` if tool has UI-based updates (skips update, shows message)
+- `uninstall_method` - How to uninstall:
+  - `"manual"` (default) - Remove binary automatically
+  - `"self"` - Tool has self-uninstall command (specify in `self_uninstall_cmd`)
+  - `"none"` - Must be uninstalled manually
+- `self_uninstall_cmd` - Command for self-uninstall (if `uninstall_method = "self"`)
+
+**Smart Defaults:**
+- `shell` - Defaults to "sh" (most installers work with POSIX sh)
+- `check_cmd` - Defaults to `<app_name> --version` or `<app_name> version`
+  - Only specify if binary name differs from app name or uses non-standard version command
+
+**Update strategies:**
+- `update_cmd` - Tool has CLI update command (runs automatically, e.g., `claude update`)
+- `self_update = true` - Tool has UI-based updates (skips update, user must use app's UI)
+- Neither - Reinstalls from scratch on update
+
+**Environment variables:**
+```toml
+[tool]
+installer = "curl"
+url = "https://example.com/install.sh"
+env = ["KEY1=value1", "KEY2=value2"]
+```
+
+**Arguments to installer:**
+```toml
+[tool]
+installer = "curl"
+url = "https://example.com/install.sh"
+args = "--skip-shell --force-install"
+```
+
 ## Commands
 
 ### install
@@ -298,7 +369,7 @@ dev app update helix
 dev app update --all
 ```
 
-**Note:** Apps with `auto_update = true` in the manifest will be skipped.
+**Note:** Apps with `self_update = true` in the manifest will be skipped with a message to use the app's built-in update mechanism.
 
 ### list
 
@@ -352,7 +423,7 @@ installer = "dmg"
 url = "https://ghostty.org/download"
 app = "Ghostty.app"
 team_id = "24VZTF6M5V"
-auto_update = true
+self_update = true
 ```
 
 ```bash
@@ -473,7 +544,8 @@ lib/
 └── app/
     ├── dmg.sh          # DMG installer backend
     ├── ubi.sh          # UBI installer backend
-    └── flatpak.sh      # Flatpak installer backend
+    ├── flatpak.sh      # Flatpak installer backend
+    └── curl.sh         # Curl-piped installer backend
 ```
 
 Each installer backend is self-contained and can be tested independently.
@@ -527,6 +599,29 @@ unknown remote         custom-remote
 ```
 
 **Solution:** Add the remote manually or use a supported remote (flathub, fedora).
+
+### Curl Installation Issues
+
+**Problem:** curl not found
+```
+curl not found         curl is required for this installer
+```
+
+**Solution:** Install curl using your system package manager.
+
+**Problem:** Install script fails
+```
+installation failed    curl installer returned error
+```
+
+**Solution:** Check the install script URL is correct and accessible. Some installers may require specific environment variables or arguments.
+
+**Problem:** Binary not found after installation
+```
+not installed         (after successful install)
+```
+
+**Solution:** Verify the binary was installed to a directory in your PATH. The installer may have installed to a non-standard location.
 
 ## Advanced Usage
 

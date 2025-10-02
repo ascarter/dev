@@ -56,6 +56,13 @@ project = "lusingander/serie"
 # AI & Code Generation Tools
 # =============================================================================
 
+[claude]
+installer = "curl"
+url = "https://claude.ai/install.sh"
+shell = "bash"  # Claude's installer requires bash
+update_cmd = "claude update"
+# Note: Claude Code CLI hardcodes ~/.claude for data storage
+
 [codex]
 installer = "ubi"
 project = "openai/codex"

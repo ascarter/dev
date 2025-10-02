@@ -21,8 +21,15 @@ installer = "dmg"
 url = "https://ghostty.org/download"
 app = "Ghostty.app"
 team_id = "24VZTF6M5V"
-auto_update = true
+self_update = true  # Use Ghostty > Check for Updates
 # user = false  # Install to /Applications (system-wide, default)
+
+[zed]
+installer = "curl"
+url = "https://zed.dev/install.sh"
+self_update = true  # Use Zed > Check for Updates
+uninstall_cmd = "rm -rf /Applications/Zed.app ~/.local/bin/zed"
+# Note: Zed installs to /Applications/Zed.app and symlinks CLI to ~/.local/bin/zed
 
 # Example: User-scope DMG installation
 # [example]
