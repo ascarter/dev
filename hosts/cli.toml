@@ -94,7 +94,6 @@ symlinks = [
   "doc/rg.1:${XDG_DATA_HOME}/man/man1/rg.1",
   "complete/_rg:${XDG_DATA_HOME}/zsh/completions/_rg"
 ]
-status_cmd = "rg --version"
 
 # =============================================================================
 # Data Processing Tools
