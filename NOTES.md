@@ -107,18 +107,93 @@ cmd_update() {
 }
 ```
 
+### Future Direction: Shell vs Rust
+
+**Current State (2025-10-02):**
+The system is implemented in POSIX shell scripts, which provides:
+- Instant hackability (edit → test, no compile cycle)
+- Transparency (easy to understand what's happening)
+- Zero compilation overhead
+- Works everywhere with just sh/bash
+
+**Question: Are we building a package manager?**
+- Not quite - no dependency resolution, version constraints, or repositories
+- More accurate: Personal environment manager that happens to install tools
+- Focus: Declarative manifest of "what I want installed" + dotfile management
+- User-scoped, XDG-compliant, platform-aware
+
+**Comparison to existing tools:**
+- Homebrew: System-wide, complex dependency graphs, hundreds of maintainers
+- Mise/asdf: Runtime version management, tasks, plugins - different focus
+- Nix/Home Manager: Much heavier, steep learning curve
+- Chezmoi: Dotfiles only, no app installation
+- **Our niche**: Combines dotfiles + app installation + shell config in one focused system
+
+**Rust migration considerations:**
+
+*Pros:*
+- 10-50x faster manifest parsing (native TOML, no yq subprocess)
+- 2-5x faster status checks (parallel operations, no process spawns)
+- UBI as a library (built-in, no subprocess overhead)
+- Version checking without spawning processes
+- Better error handling (Result types vs shell)
+- Type-safe manifest validation
+- Structured logging and progress bars
+- GitHub releases → single binary distribution
+- Profiles feature becomes natural to implement
+
+*Cons:*
+- Loss of instant hackability (edit → compile → test cycle)
+- Need to learn/maintain Rust code
+- Current system works well
+- Some platform-specific operations still need shell (DMG mounting, etc.)
+
+**Translation difficulty:**
+- Core functionality: 2-3 weeks (experienced Rust developer)
+- Feature parity: 4-6 weeks
+- Polish + testing: +2 weeks
+
+**Key crates:**
+- clap (CLI), serde/toml (config), tokio (async), ubi (library)
+- anyhow (errors), indicatif (progress), git2, directories
+
+**Profile concept (compelling for Rust):**
+```bash
+dev profile clone codespaces/python-ml
+dev profile activate python-ml
+# → Clones config repo, installs manifests, links configs
+```
+
+Benefits:
+- Different tool sets for different contexts (work/personal/project)
+- Perfect for Codespaces/Toolbox containers
+- Easy in Rust, hard in shell
+
+**Decision: Hybrid approach**
+1. Continue in shell for now (working, making progress)
+2. Design with Rust in mind (modular architecture, TOML manifests)
+3. Prototype Rust version when:
+   - Performance becomes an issue
+   - Profiles feature is strongly desired
+   - Time available to learn/experiment
+4. Could keep both: Rust core + shell for platform-specific operations
+
+**Bottom line:**
+The manifest format and architecture are the hard parts. Implementation language is just details. Current shell implementation is winning on hackability. Rust would win on performance and advanced features (profiles, parallel ops, version checking).
+
 ### Potential Future Enhancements
 
 **Application Management:**
-- Support for Homebrew cask apps in manifests
 - Version pinning for reproducible environments
 - Dependency resolution between apps
 - Manifest validation before install
+- Parallel installation (easier in Rust)
 
 **Configuration:**
 - Template support for machine-specific configs
 - Encrypted secret management
 - Config validation
+- Profile system (work/personal/project contexts)
 
 **Tools:**
 - More language toolchains (Elixir, Java, etc.)
