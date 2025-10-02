@@ -181,6 +181,101 @@ Benefits:
 **Bottom line:**
 The manifest format and architecture are the hard parts. Implementation language is just details. Current shell implementation is winning on hackability. Rust would win on performance and advanced features (profiles, parallel ops, version checking).
 
+## Transition to devspace (Rust Implementation)
+
+**Date: 2025-10-02**
+
+**Decision:** Create new Rust-based project called `devspace` that reimplements this shell-based system from the ground up.
+
+### The devspace Concept
+
+A **devspace** is a "profile" of dotfiles + tools that can be deployed in different environments.
+
+**Key Ideas:**
+- Single Rust binary deployment (curl install or simple download)
+- Shell configuration + tool manifests in user's GitHub repo
+- POSIX-focused (macOS, Linux, BSD conceptually)
+- Works in: host, toolbox, devcontainer, codespaces
+- User maintains profile repo with shell config + manifests
+- Could provide default base environment to extend
+- Tool reaches steady state; iteration happens in profile space
+- Includes comprehensive tests that also serve as examples
+
+### Transition Plan
+
+**Phase 1: Foundation**
+1. Create GitHub repository: `devspace`
+2. Initialize Rust project with Cargo.toml
+3. Set up CI/CD (GitHub Actions for tests + releases)
+4. Create ASSISTANT.md with full context from this project
+5. Create NOTES.md with roadmap
+6. Design CLI structure with clap
+7. Implement command scaffolding (no-op implementations)
+8. Verify ergonomics with --help output
+
+**Phase 2: Core Infrastructure**
+1. TOML parsing & manifest types
+2. Platform detection (macOS, Linux, BSD)
+3. Error types & handling
+4. Logging/output formatting
+5. Tests for all core functionality
+
+**Phase 3: Feature Porting (one at a time, with tests + docs)**
+Priority order:
+1. Profile loading (local directory first)
+2. Symlink management (critical for dotfiles)
+3. UBI backend (enables real installs)
+4. Status/list commands
+5. Config management
+6. DMG backend (macOS)
+7. Flatpak backend (Linux)
+8. Curl backend
+9. Profile cloning from GitHub
+10. Advanced features (parallel installs, version checking, dev doctor)
+
+**Phase 4: Release Preparation**
+1. GitHub Actions for cross-compilation
+2. Installation script
+3. Profile repository template
+4. Migration documentation from shell version
+5. User guide
+
+### Context Preservation
+
+**This project (`/Users/acarter/.local/share/dev`):**
+- Serves as reference implementation
+- Demonstrates what works in shell
+- Contains full history of design decisions
+- Will be linked from devspace ASSISTANT.md
+
+**Key learnings to carry forward:**
+- Manifest-based declarative approach works well
+- Separation of bin vs symlinks is important
+- Platform detection matters (macos.toml vs linux.toml)
+- XDG compliance is valuable
+- Smart defaults reduce boilerplate
+- Health checks (dev doctor) are useful
+- Self-update flag for GUI apps
+
+**What to improve in Rust:**
+- Native TOML parsing (no yq subprocess)
+- Parallel operations
+- Better error messages with context
+- Version checking without process spawns
+- Profile system for multi-context workflows
+- Type-safe manifest validation
+- Structured progress output
+
+### Next Steps
+
+1. Create GitHub repository
+2. Initialize Rust project structure
+3. Transfer context via ASSISTANT.md and NOTES.md
+4. Start new Claude Code session in devspace
+5. Begin Phase 1: CLI scaffolding
+
+**Reference:** This shell implementation remains as working proof-of-concept and source of truth for features and behavior.
+
 ### Potential Future Enhancements
 
 **Application Management:**
