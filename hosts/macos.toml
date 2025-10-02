@@ -1,0 +1,33 @@
+# macos.toml - macOS Application Manifest
+#
+# This manifest defines macOS-specific applications.
+# CLI tools shared across platforms are defined in cli.toml.
+#
+# Supported installer types:
+#   - dmg: macOS DMG installers
+#
+# Usage:
+#   dev app install ghostty
+#   dev app install --all
+#   dev app status --all
+#   dev app update --all
+
+# =============================================================================
+# GUI Applications (DMG)
+# =============================================================================
+
+[ghostty]
+installer = "dmg"
+url = "https://ghostty.org/download"
+app = "Ghostty.app"
+team_id = "24VZTF6M5V"
+auto_update = true
+# user = false  # Install to /Applications (system-wide, default)
+
+# Example: User-scope DMG installation
+# [example]
+# installer = "dmg"
+# url = "https://example.com/MyApp.dmg"
+# app = "MyApp.app"
+# team_id = "ABCDE12345"
+# user = true  # Install to ~/Applications

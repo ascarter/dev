@@ -6,8 +6,8 @@ XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
 RBENV_ROOT="${RBENV_ROOT:-${XDG_DATA_HOME}/rbenv}"
 RUBY_CONFIGURE_OPTS="--enable-yjit"
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 latest() {
   # Verify rustc is available

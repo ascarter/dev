@@ -10,11 +10,11 @@ DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
 DEV_CONFIG=${DEV_CONFIG:-${XDG_CONFIG_HOME}/dev}
 TARGET=${TARGET:-$HOME}
 
-# Source devlog library for consistent logging (with fallback if not available)
-if [ -f "${DEV_HOME}/bin/devlog" ]; then
-  . "${DEV_HOME}/bin/devlog"
+# Source log library for consistent logging (with fallback if not available)
+if [ -f "${DEV_HOME}/lib/log.sh" ]; then
+  . "${DEV_HOME}/lib/log.sh"
 else
-  # Fallback log function if devlog not available
+  # Fallback log function if log library not available
   log() {
     if [ "$#" -eq 0 ]; then
       printf "\n"

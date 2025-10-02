@@ -10,8 +10,8 @@
 XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}
 ZED_CHANNEL=${ZED_CHANNEL:-stable}
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 install() {
   # Check if zed is already installed

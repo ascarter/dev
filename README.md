@@ -46,7 +46,11 @@ cd ~/.local/share/dev
 2. Clones the repository to `$HOME/.local/share/dev`
 3. Initializes ZSH integration in `~/.zshenv`
 4. Links configuration files to `$XDG_CONFIG_HOME`
-5. Prompts to run platform-specific host provisioning
+5. Installs **ubi** (Universal Binary Installer) for GitHub release management
+6. Installs **yq** (TOML/YAML/JSON parser) for manifest parsing (minimal binary-only install)
+7. Prompts to run platform-specific host provisioning
+
+**Note:** The installer bootstraps `ubi` and a minimal `yq` binary as they are required dependencies for the app management system. For the full `yq` installation with man pages, run `dev app install yq` after bootstrap.
 
 ### Uninstall
 

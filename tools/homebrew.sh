@@ -15,8 +15,8 @@ Linux)
   ;;
 esac
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 install() {
   if [ -d "${HOMEBREW_PREFIX}" ] && [ -x "${HOMEBREW_PREFIX}/bin/brew" ]; then

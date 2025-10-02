@@ -8,12 +8,6 @@
 # Completion system
 # =====================================
 
-# Add homebrew completion locations
-if command -v brew >/dev/null 2>&1; then
-  rustup_prefix=$(brew --prefix rustup 2>/dev/null)
-  [[ -d "$rustup_prefix/share/zsh/site-functions" ]] && fpath+=("$rustup_prefix/share/zsh/site-functions")
-fi
-
 # Add dev completions directory
 if [[ -d "${XDG_DATA_HOME}/zsh/completions" ]]; then
   fpath=("${XDG_DATA_HOME}/zsh/completions" $fpath)
@@ -33,6 +27,15 @@ autoload -Uz add-zsh-hook
 # Enable bash compatibility
 autoload -Uz bashcompinit
 bashcompinit
+
+# =====================================
+# man pages
+# =====================================
+
+# Add XDG_DATA_HOME/man to MANPATH for tools that install man pages locally
+if [[ -d "${XDG_DATA_HOME}/man" ]]; then
+  export MANPATH="${XDG_DATA_HOME}/man:${MANPATH}"
+fi
 
 # =====================================
 # ZSH Options

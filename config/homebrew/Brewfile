@@ -1,25 +1,13 @@
-# Common command line tools
 brew "btop"
 brew "cmark-gfm"
-brew "fastfetch"
+brew "eza"
 brew "htop"
-brew "jq"
-brew "serie"
+brew "shellcheck"
+brew "sqlite"
 brew "uutils-coreutils"
 brew "uutils-diffutils"
 brew "uutils-findutils"
 brew "ykman"
-brew "yq"
-
-# Editors
-brew "helix"
-
-# Developer tools
-brew "gh"
-brew "marksman"
-brew "shfmt"
-brew "sqlite"
-brew "taplo"
 
 if OS.mac?
   brew "gnupg"
@@ -32,7 +20,6 @@ if OS.mac?
   cask "chatgpt"
   cask "claude"
   cask "docker-desktop"
-  cask "ghostty"
   cask "github"
   cask "hhkb"
   cask "karabiner-elements"

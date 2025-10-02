@@ -58,7 +58,7 @@ dev env
 # Initialize shell integration (zsh only)
 dev init
 
-# Update dev from git and re-link
+# Update dev from git and re-link (TODO)
 dev update
 
 # Edit dev repository in $EDITOR
@@ -74,6 +74,19 @@ dev host
 
 # Manage tools
 dev tool [name] [action]
+
+# Manage applications from manifests
+dev app install <name>         # Install specific app
+dev app install --all          # Install all apps from manifests
+dev app uninstall <name>       # Uninstall specific app
+dev app status <name>          # Show status of specific app
+dev app status --all           # Show status of all apps
+dev app update <name>          # Update specific app
+dev app update --all           # Update all apps
+dev app list                   # List all apps in manifests
+
+# Run utility scripts
+dev script [name] [-- args]
 ```
 
 ## Key Environment Variables
@@ -110,20 +123,29 @@ User-specific configurations can be placed in `$XDG_CONFIG_HOME/dev/` to overrid
 - Use .editorconfig settings instead of modelines in the files
 - Do not create git commits unless instructed to do so
 
-## Hosts, Tools, and Scripts System
+## Hosts, Tools, Apps, and Scripts System
 
 ### Hosts
-The `hosts/` directory contains platform-specific provisioning scripts for macOS, Fedora, and Ubuntu. These scripts are fully idempotent - they check current state, install what's missing, and update what exists. Each script can be run multiple times safely and will bring the system to the desired state.
+The `hosts/` directory contains platform-specific provisioning scripts and application manifests.
 
-**Host Provisioning:**
+**Host Provisioning Scripts:**
 - `hosts/macos.sh` - macOS provisioning (Xcode, Homebrew, Brewfile, system settings)
 - `hosts/fedora.sh` - Fedora provisioning (firmware, rpm-ostree/dnf, flatpak, desktop settings)
 - `hosts/ubuntu.sh` - Ubuntu/Debian provisioning (apt packages, updates)
 
-All host scripts are idempotent - they install missing packages and update existing ones in a single run.
+All host scripts are fully idempotent - they check current state, install what's missing, and update what exists in a single run. Invoked via `dev host` which auto-detects platform.
+
+**Application Manifests (TOML):**
+- `hosts/cli.toml` - Cross-platform CLI tools (20+ tools: helix, gh, fd, ripgrep, yq, bat, jq, etc.)
+- `hosts/macos.toml` - macOS-specific applications (DMG installers like Ghostty)
+- `hosts/linux.toml` - Linux-specific applications (Flatpak apps like Vivaldi, Flatseal)
+
+The system automatically loads both `cli.toml` and the platform-specific manifest. Platform manifests can override `cli.toml` entries if needed, eliminating duplication while allowing customization.
+
+Manifests are used by the `dev app` command for declarative application management. See `docs/app-management.md` for details.
 
 ### Tools
-The `tools/` directory contains installable development tools managed via `dev tool <name> <action>`. Each tool script supports actions that make sense for that tool (typically: install, update, uninstall, status).
+The `tools/` directory contains installable development tools managed via `dev tool <name> <action>`. These are tools with complex setup requirements that need custom installation logic.
 
 **Tool Categories:**
 
@@ -144,17 +166,39 @@ The `tools/` directory contains installable development tools managed via `dev t
 - `zed.sh` - Zed editor
 
 *Utilities:*
-- `ubi.sh` - GitHub release binary installer
+- `ubi.sh` - GitHub release binary installer (bootstrap dependency)
 
 All tools support standard actions (install/update/uninstall/status) and can be run independently and repeatedly without issues.
 
+### Apps (Manifest-Based)
+Applications and CLI tools are managed declaratively via TOML manifests using the `dev app` command. This provides unified management across different installer types (UBI, DMG, Flatpak).
+
+**Why Manifests vs Tool Scripts:**
+- **Manifests:** Simple CLI tools with standard installation patterns (helix, gh, fd, ripgrep, etc.)
+- **Tool Scripts:** Complex installations requiring custom logic (language toolchains, package managers, special apps)
+
+**Installer Backends:**
+- `lib/app/ubi.sh` - GitHub releases via UBI (cross-platform CLI tools)
+- `lib/app/dmg.sh` - macOS DMG installers with code signing verification
+- `lib/app/flatpak.sh` - Linux Flatpak apps from Flathub
+
+**Key Features:**
+- Multi-manifest support (shared + platform-specific)
+- Smart binary detection for platform-specific variants
+- Symlink management for completions and man pages
+- Idempotent operations (safe to re-run)
+- Batch operations (process all apps at once)
+
+See `docs/app-management.md` for complete documentation.
+
 ### Scripts
-The `scripts/` directory contains utility and configuration scripts that are run directly rather than through `dev tool`. These handle specialized configuration, backups, and platform-specific setup.
+The `scripts/` directory contains utility and configuration scripts that are run directly via `dev script <name>` rather than through `dev tool`. These handle specialized configuration, backups, and platform-specific setup.
 
 **Configuration Scripts:**
 - `gpg.sh` - GPG configuration
 - `ssh.sh` - SSH configuration
 - `github.sh` - GitHub CLI setup
+- `gitconfig.sh` - Generate machine-specific git configuration
 
 **Backup/Restore:**
 - `gpg-backup.sh` - Backup GPG keys
@@ -166,27 +210,38 @@ The `scripts/` directory contains utility and configuration scripts that are run
 - `tailnet.sh` - Tailscale network setup
 - `steam.sh` - Steam gaming platform
 
-## Implementation Status
+## Key Components
 
-**Completed:**
-- ✅ `bin/dev` - Main command with full option parsing and help
-- ✅ `bin/devlog` - Standard logging helper (sourceable library + standalone)
-- ✅ `dev env` - Environment export with ZDOTDIR for shell integration
-- ✅ `dev init` - Shell initialization (writes bootstrap to ~/.zshenv)
-- ✅ `dev edit` - Opens DEV_HOME in $EDITOR
-- ✅ `dev config` - Complete symlink management (status/link/unlink)
-- ✅ `dev host` - Idempotent platform provisioning (auto-detects platform)
-- ✅ `dev tool` - Tool installation management with help and status-all support
-- ✅ `dev script` - Script runner for utility scripts
-- ✅ `config/` - All configuration files ported from dotfiles
-- ✅ `config/zsh/` - ZSH configuration with rc.d modules
-- ✅ `hosts/` - Platform scripts (macos, fedora, ubuntu) - fully idempotent with devlog
-- ✅ `tools/` - 11 tool installation scripts (all using devlog library)
-- ✅ `scripts/` - 10 utility and configuration scripts (gitconfig, github, ssh, etc.)
-- ✅ `install.sh` and `uninstall.sh` - Bootstrap scripts with devlog
+### Core System
+- **`bin/dev`** - Main command with full option parsing and help
+- **`lib/log.sh`** - Standard logging library (sourceable for 2x performance)
+- **`lib/app.sh`** - Application management module (unified installer interface)
+- **`lib/toml.sh`** - TOML parser library (shell-based fallback, unused but kept)
+- **`lib/app/`** - Installer backends (dmg.sh, ubi.sh, flatpak.sh)
 
-**To Do:**
-- ⏳ `dev update` - Git update and re-link
+**Note:** The system uses `yq` for TOML parsing (robust, spec-compliant). A minimal yq binary is auto-installed during bootstrap via ubi.
+
+### Commands
+- **`dev env`** - Environment export with ZDOTDIR for shell integration
+- **`dev init`** - Shell initialization (writes bootstrap to ~/.zshenv)
+- **`dev edit`** - Opens DEV_HOME in $EDITOR
+- **`dev config`** - Complete symlink management (status/link/unlink)
+- **`dev host`** - Idempotent platform provisioning (auto-detects platform)
+- **`dev tool`** - Tool installation management (11 tools with install/update/uninstall/status)
+- **`dev app`** - Manifest-based application management (install/uninstall/status/update/list)
+- **`dev script`** - Script runner for utility scripts (10 configuration/backup scripts)
+- **`dev update`** - Git update and re-link (TODO - not yet implemented)
+
+### Configuration & Scripts
+- **`config/`** - All configuration files symlinked to $XDG_CONFIG_HOME
+- **`config/zsh/`** - ZSH configuration with modular profile.d/ and rc.d/
+- **`hosts/`** - Platform provisioning scripts + application manifests
+  - Platform scripts: macos.sh, fedora.sh, ubuntu.sh
+  - Manifests: cli.toml (20+ tools), macos.toml, linux.toml
+- **`tools/`** - Tool installation scripts (11 tools: language toolchains, package managers, special apps)
+- **`scripts/`** - Utility and configuration scripts (10 scripts: gitconfig, github, ssh, gpg, backups, etc.)
+- **`docs/`** - Reference documentation (app-management.md, bootstrap.md)
+- **`install.sh` and `uninstall.sh`** - Bootstrap scripts
 
 ## Code Patterns
 
@@ -201,10 +256,10 @@ The `scripts/` directory contains utility and configuration scripts that are run
 - Pattern: "command: error message"
 
 **Logging Patterns:**
-All scripts use the devlog library for consistent logging:
+All scripts use the log library for consistent logging:
 ```sh
-# Source devlog library for performance (at top of script)
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance (at top of script)
+. "$(dirname "$0")/../lib/log.sh"
 
 # Then use log function directly
 log info "label" "message"     # Info (default level)
@@ -219,7 +274,7 @@ log ""                         # Empty line
 ```sh
 # Set DEVLOG_WIDTH before sourcing for wider labels
 DEVLOG_WIDTH=26
-. "$(dirname "$0")/devlog"
+. "$(dirname "$0")/log"
 ```
 
 **Usage Display:**

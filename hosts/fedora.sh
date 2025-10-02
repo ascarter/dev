@@ -4,8 +4,8 @@
 
 set -eu
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 # Verify Linux
 if [ "$(uname -s)" != "Linux" ]; then

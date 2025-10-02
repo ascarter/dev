@@ -8,8 +8,8 @@
 
 CLAUDE_DIR="${HOME}/.claude" # Hardcoded by Claude, not XDG compliant
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 install() {
   # Check if claude is already installed

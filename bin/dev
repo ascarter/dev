@@ -15,9 +15,9 @@ EXCLUDE_PATTERNS=".DS_Store Thumbs.db *.tmp .gitkeep"
 # Logging functions
 # ------------------------------
 
-# Source devlog library for performance
+# Source log library for performance
 DEVLOG_WIDTH=26
-. "$(dirname "$0")/devlog"
+. "$(dirname "$0")/../lib/log.sh"
 
 # Wrapper functions with custom width
 vlog() {
@@ -52,6 +52,7 @@ usage() {
   log "  edit" "Edit dev repository in \$EDITOR"
   log "  config <action>" "Manage configuration files (status|link|unlink)"
   log "  host" "Provision and update host system"
+  log "  app <action> [name]" "Manage applications (install|uninstall|status|update|list)"
   log "  tool [name] [action]" "Manage tool installation"
   log "  script [name] [-- args]" "Run utility script"
   log ""
@@ -543,6 +544,10 @@ host)
   ;;
 tool)
   cmd_tool "$@"
+  ;;
+app)
+  . "${DEV_HOME}/lib/app.sh"
+  app_main "$@"
   ;;
 script)
   cmd_script "$@"

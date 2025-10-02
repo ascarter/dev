@@ -1,38 +1,25 @@
 #!/bin/sh
 
-# devlog - Standard logging helper for dev scripts
+# log.sh - Standard logging library for dev scripts
 #
-# Can be used as a standalone command OR sourced as a library
-#
-# === STANDALONE USAGE ===
-#   devlog <message>                 - Log message with default (info) level
-#   devlog info <label> [message]    - Info message (default)
-#   devlog warn <label> [message]    - Warning message (yellow label)
-#   devlog error <label> [message]   - Error message (red label, stderr)
-#   devlog debug <label> [message]   - Log only if VERBOSE=1
-#
-# === LIBRARY USAGE ===
-#   . "$DEV_HOME/bin/devlog"
+# Usage:
+#   . "${DEV_HOME}/lib/log.sh"
 #   log info "install" "Installing package"
 #   log warn "deprecated" "This feature is deprecated"
 #   log error "failed" "Installation failed"
 #   log debug "trace" "Debug information"
 #   log "simple" "Just a message"
+#   log  # Print blank line
 #
 # Environment Variables:
 #   DEVLOG_WIDTH - Field width for label column (default: 16)
 #   VERBOSE      - Enable verbose logging (0 or 1)
-#
-# Examples:
-#   devlog "Simple message"
-#   devlog info "install" "Installing package"
-#   DEVLOG_WIDTH=26 devlog info "long label" "Custom width"
 
 # Prevent multiple sourcing
-if [ -n "${DEVLOG_SOURCED:-}" ]; then
-  return 0 2>/dev/null || exit 0
+if [ -n "${LOG_SOURCED:-}" ]; then
+  return 0
 fi
-DEVLOG_SOURCED=1
+LOG_SOURCED=1
 
 # Default field width for label column (can be overridden with DEVLOG_WIDTH)
 DEVLOG_FIELD_WIDTH=${DEVLOG_WIDTH:-16}
@@ -59,6 +46,26 @@ _devlog_format() {
       printf "$(tput bold)%-${DEVLOG_FIELD_WIDTH}s$(tput sgr0) %s\n" "$label" "$message"
     fi
   fi
+}
+
+# Status output function (3 columns: name, type, status)
+log_status() {
+  local name="$1"
+  local type="$2"
+  local status="$3"
+  local level="${4:-info}"
+
+  case "$level" in
+  warn)
+    printf "$(tput setaf 3)%-20s %-10s %s$(tput sgr0)\n" "$name" "$type" "$status"
+    ;;
+  error)
+    printf "$(tput setaf 1)%-20s %-10s %s$(tput sgr0)\n" "$name" "$type" "$status" >&2
+    ;;
+  *)
+    printf "%-20s %-10s %s\n" "$name" "$type" "$status"
+    ;;
+  esac
 }
 
 # Main log function (exported for library use)
@@ -107,27 +114,4 @@ log() {
   esac
 }
 
-# Main function for standalone execution
-_devlog_main() {
-  if [ "$#" -eq 0 ]; then
-    echo "devlog: no arguments provided" >&2
-    echo "Usage: devlog {info|warn|error|debug} <label> [message]" >&2
-    echo "       devlog <message>" >&2
-    exit 1
-  fi
-
-  # Use the log function
-  log "$@"
-}
-
-# Detect if script is being executed (not sourced)
-# This works by checking if $0 matches the script name
-case "${0##*/}" in
-devlog)
-  # Script is being executed directly
-  set -eu
-  _devlog_main "$@"
-  ;;
-esac
-
-# If sourced, the log function is now available
+# Library is ready - log function is available

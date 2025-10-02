@@ -1,0 +1,89 @@
+# linux.toml - Linux Application Manifest
+#
+# This manifest defines Linux-specific applications.
+# CLI tools shared across platforms are defined in cli.toml.
+#
+# Supported installer types:
+#   - flatpak: Linux GUI applications from Flathub
+#
+# Usage:
+#   dev app install flatseal
+#   dev app install --all
+#   dev app status --all
+#   dev app update --all
+
+# =============================================================================
+# GUI Applications (Flatpak)
+# =============================================================================
+
+[flatseal]
+installer = "flatpak"
+app_id = "com.github.tchx84.Flatseal"
+remote = "flathub"
+
+[vivaldi]
+installer = "flatpak"
+app_id = "com.vivaldi.Vivaldi"
+remote = "flathub"
+
+[vlc]
+installer = "flatpak"
+app_id = "org.videolan.VLC"
+remote = "flathub"
+
+[github-desktop]
+installer = "flatpak"
+app_id = "io.github.shiftey.Desktop"
+remote = "flathub"
+
+[mission-center]
+installer = "flatpak"
+app_id = "io.missioncenter.MissionCenter"
+remote = "flathub"
+
+[podman-desktop]
+installer = "flatpak"
+app_id = "io.podman_desktop.PodmanDesktop"
+remote = "flathub"
+
+# COSMIC Desktop specific apps
+[forecast]
+installer = "flatpak"
+app_id = "com.jwestall.Forecast"
+remote = "flathub"
+
+[trayscale]
+installer = "flatpak"
+app_id = "dev.deedles.Trayscale"
+remote = "flathub"
+
+[calculator]
+installer = "flatpak"
+app_id = "dev.edfloreshz.Calculator"
+remote = "flathub"
+
+[examine]
+installer = "flatpak"
+app_id = "io.github.cosmic_utils.Examine"
+remote = "flathub"
+
+# GNOME Desktop specific apps
+[connections]
+installer = "flatpak"
+app_id = "org.gnome.Connections"
+remote = "fedora"
+
+[gnome-extensions]
+installer = "flatpak"
+app_id = "org.gnome.Extensions"
+remote = "fedora"
+
+[loupe]
+installer = "flatpak"
+app_id = "org.gnome.Loupe"
+remote = "fedora"
+
+[extension-manager]
+installer = "flatpak"
+app_id = "com.mattjakeman.ExtensionManager"
+remote = "flathub"

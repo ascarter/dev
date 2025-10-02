@@ -15,8 +15,8 @@ set -eu
 
 GIT_CONFIG_FILE="${HOME}/.gitconfig"
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 # Configure user identity
 configure_user() {

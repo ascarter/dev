@@ -2,8 +2,8 @@
 
 set -eu
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 # GitHub CLI extensions installer
 if command -v gh >/dev/null 2>&1; then

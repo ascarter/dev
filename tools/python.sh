@@ -8,8 +8,8 @@ UV_HOME="${UV_HOME:-${XDG_DATA_HOME}/uv}"
 UV_TOOL_DIR="${UV_TOOL_DIR:-${UV_HOME}/tools}"
 UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-${UV_HOME}/bin}"
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 install() {
   # Check if uv is already installed

@@ -6,8 +6,8 @@
 
 XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}
 
-# Source devlog library for performance
-. "$(dirname "$0")/../bin/devlog"
+# Source log library for performance
+. "$(dirname "$0")/../lib/log.sh"
 
 _do_install() {
   # Internal function that actually performs the installation

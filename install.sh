@@ -14,11 +14,11 @@ DEV_HOME=${DEV_HOME:-${XDG_DATA_HOME}/dev}
 DEV_BRANCH=${DEV_BRANCH:-main}
 TARGET=${TARGET:-$HOME}
 
-# Source devlog library for consistent logging (with fallback if not yet installed)
-if [ -f "${DEV_HOME}/bin/devlog" ]; then
-  . "${DEV_HOME}/bin/devlog"
+# Source log library for consistent logging (with fallback if not yet installed)
+if [ -f "${DEV_HOME}/lib/log.sh" ]; then
+  . "${DEV_HOME}/lib/log.sh"
 else
-  # Fallback log function if devlog not yet installed
+  # Fallback log function if log library not yet installed
   log() {
     if [ "$#" -eq 0 ]; then
       printf "\n"
@@ -154,6 +154,17 @@ else
   log info "install" "ubi already installed, skipping"
 fi
 
+# Install yq for TOML parsing (required by app management)
+if ! command -v yq >/dev/null 2>&1; then
+  log info "install" "Installing yq (TOML parser)"
+  # Bootstrap yq using ubi (binary only - full install via manifest)
+  mkdir -p "${XDG_BIN_HOME}"
+  ubi --project mikefarah/yq --in "${XDG_BIN_HOME}"
+  log info "install" "yq installed (run 'dev app install yq' for full install with man pages)"
+else
+  log info "install" "yq already installed, skipping"
+fi
+
 # Run appropriate host provisioning script
 HOST_SCRIPT="${DEV_HOME}/hosts/${PLATFORM_ID}.sh"
 if [ -f "${HOST_SCRIPT}" ]; then
@@ -167,3 +178,8 @@ fi
 log ""
 log info "install" "dev installation complete"
 log info "install" "Reload your session to apply configuration"
+log ""
+log info "next steps" "Install applications from manifest:"
+log info "next steps" "  dev app install --all      # Install all apps"
+log info "next steps" "  dev app install yq         # Full yq install with man pages"
+log info "next steps" "  dev app list               # List available apps"
