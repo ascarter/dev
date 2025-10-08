@@ -45,6 +45,9 @@ Darwin)
   # QuickLook
   alias ql='qlmanage -p "$@" >& /dev/null'
 
+  # Safari
+  alias safari="open -a Safari"
+
   # Sketch
   alias sketchtool="$(mdfind kMDItemCFBundleIdentifier = 'com.bohemiancoding.sketch3' | head -n 1)/Contents/Resources/sketchtool/bin/sketchtool"
 
