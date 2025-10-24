@@ -113,55 +113,46 @@ zstyle ':completion:*' file-list all
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
 # =====================================
-# Key bindings & Vi Mode
+# Key bindings (Emacs mode with Vim-inspired enhancements)
 # =====================================
 
-# Enable vim mode
-bindkey -v
+# Enable Emacs editing mode
+bindkey -e
 
-# Enable edit command line using $EDITOR
+# Edit command line in $EDITOR (Helix/Zed)
 autoload -Uz edit-command-line
 zle -N edit-command-line
+bindkey '^X^E' edit-command-line        # Ctrl-X Ctrl-E to open current line in $EDITOR
 
-# Bind `v` to edit the command line in the editor
-bindkey -M vicmd 'v' edit-command-line
+# Vim-like movement on Meta-h/j/k/l (useful on HHKB without arrows)
+bindkey '^[h' backward-char
+bindkey '^[l' forward-char
+bindkey '^[j' down-line-or-history
+bindkey '^[k' up-line-or-history
 
-# Better vim mode experience
-# Reduce delay when switching modes
-export KEYTIMEOUT=1
-
-# Change cursor shape according to vi mode
-# Don't run when in Ghostty since it already supports this.
-if [[ "$TERM" != *ghostty* && "$GHOSTTY_SHELL_INTEGRATION_NO_CURSOR" != 1 ]]; then
-  # Change the cursor shape according to the current vi mode.
-  _vi_cursor_mode() {
-    case ${KEYMAP-} in
-      vicmd|visual)  print -Pn "\e[1 q" ;;  # Block cursor
-      *)             print -Pn "\e[5 q" ;;  # Beam cursor
-    esac
-  }
-
-  # Bind cursor mode function to appropriate ZLE hooks
-  zle-line-init() { _vi_cursor_mode }
-  zle-keymap-select() { _vi_cursor_mode }
-
-  # Register functions as ZLE widgets
-  zle -N zle-line-init
-  zle -N zle-keymap-select
-
-  # Reset cursor before executing commands
-  _vi_preexec_reset_cursor() {
-    print -Pn "\e[0 q"
-  }
-  add-zsh-hook preexec _vi_preexec_reset_cursor
-fi
-
-# Add useful vi-mode key bindings
+# Explicit standard movements/history (some already default)
 bindkey '^P' up-history
 bindkey '^N' down-history
+bindkey '^A' beginning-of-line
+bindkey '^E' end-of-line
+
+# Word motions (Meta-b/f are default; declare for clarity)
+bindkey '^[b' backward-word
+bindkey '^[f' forward-word
+
+# Deletions / kills
+bindkey '^W' backward-kill-word         # kill previous word
+bindkey '^[d' kill-word                 # Meta-d kill next word
+bindkey '^K' kill-line                  # kill to end of line
+bindkey '^U' backward-kill-line         # kill to start of line
+bindkey '^[t' transpose-words           # swap adjacent words
+
+# Yank enhancements
+bindkey '^[y' yank                      # Meta-y also yanks (Ctrl-Y is default)
+
+# Backspace variations
 bindkey '^?' backward-delete-char
 bindkey '^h' backward-delete-char
-bindkey '^w' backward-kill-word
 
 # =====================================
 # Load rc modules

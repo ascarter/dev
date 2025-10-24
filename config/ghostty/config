@@ -1,9 +1,25 @@
 font-family = "Berkeley Mono"
 background-opacity = 0.98
 background-blur-radius = 20
-keybind = global:alt+grave_accent=toggle_quick_terminal
-mouse-hide-while-typing = true
-focus-follows-mouse = true
-keybind = shift+enter=text:\n
 window-padding-x = 12
 window-padding-y = 12
+mouse-hide-while-typing = true
+focus-follows-mouse = true
+
+# Show quick terminal with alt+`
+keybind = global:alt+grave_accent=toggle_quick_terminal
+
+# Enable shift+enter to be alternate for newline
+keybind = shift+enter=text:\n
+
+# Vim style navigation
+keybind = super+u=scroll_page_up
+keybind = super+d=scroll_page_down
+keybind = super+alt+j=goto_split:down
+keybind = super+alt+k=goto_split:up
+keybind = super+alt+h=goto_split:left
+keybind = super+alt+l=goto_split:right
+keybind = super+ctrl+j=resize_split:down,10
+keybind = super+ctrl+k=resize_split:up,10
+keybind = super+ctrl+h=resize_split:left,10
+keybind = super+ctrl+l=resize_split:right,10
