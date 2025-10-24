@@ -148,7 +148,7 @@ bindkey '^U' backward-kill-line         # kill to start of line
 bindkey '^[t' transpose-words           # swap adjacent words
 
 # Yank enhancements
-bindkey '^[y' yank                      # Meta-y also yanks (Ctrl-Y is default)
+
 
 # Backspace variations
 bindkey '^?' backward-delete-char

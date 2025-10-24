@@ -13,7 +13,6 @@ Your custom additions:
 - M-h / M-l for left/right char movement
 - M-j / M-k for down/up history navigation
 - C-X C-E to open the current line in `$EDITOR`
-- M-y remapped to plain yank (overrides default yank-pop)
 - Explicit bindings for kill/yank operations
 - Redundant movement bindings retained for clarity
 
@@ -21,7 +20,19 @@ Note: This is a focused, high-value subset—ZLE has more widgets than listed he
 
 ---
 
-## 1. Cursor Movement
+## Minimal Cheat Sheet
+
+| Category | Keys |
+|----------|------|
+| Movement | C-a C-e M-b M-f C-p C-n M-h M-l M-j M-k |
+| Edit | C-w M-d C-k C-u C-y M-y M-t C-t |
+| Search | C-r C-s C-g |
+| History | C-p C-n M-p M-n |
+| External Edit | C-x C-e |
+| Clear Screen | C-l |
+| Execute | Enter (C-m) |
+
+## Cursor Movement
 
 | Action | Description | Default Binding(s) | Added / Alternate | Notes |
 |--------|-------------|--------------------|-------------------|-------|
@@ -41,7 +52,7 @@ Note: This is a focused, high-value subset—ZLE has more widgets than listed he
 
 ---
 
-## 2. History Search & Navigation
+## History Search & Navigation
 
 | Action | Description | Default Binding(s) | Added / Alternate | Notes |
 |--------|-------------|--------------------|-------------------|-------|
@@ -53,7 +64,7 @@ Note: This is a focused, high-value subset—ZLE has more widgets than listed he
 
 ---
 
-## 3. Deletion & Killing
+## Deletion & Killing
 
 | Action | Description | Default Binding(s) | Added / Alternate | Notes |
 |--------|-------------|--------------------|-------------------|-------|
@@ -72,12 +83,12 @@ Note: This is a focused, high-value subset—ZLE has more widgets than listed he
 
 ---
 
-## 4. Yank & Kill Ring
+## Yank & Kill Ring
 
 | Action | Description | Default Binding(s) | Added / Alternate | Notes |
 |--------|-------------|--------------------|-------------------|-------|
-| Yank (paste last killed text) | Insert most recent kill | C-y | M-y (REMAPPED) | You repurposed M-y to duplicate yank |
-| Yank-pop (cycle through kill ring) | Replace last yank with earlier kill | M-y | (Lost due to remap) | To restore yank-pop, remove the M-y remap |
+| Yank (paste last killed text) | Insert most recent kill | C-y | — | |
+| Yank-pop (cycle through kill ring) | Replace last yank with earlier kill | M-y | — | Requires a prior yank (C-y) to start cycling |
 | Copy region (kill-ring-save) | Add region to kill ring without deleting | M-w | — | Requires an active region |
 | Kill region | Delete region | C-w (when region set) | — | Falls back to backward-kill-word w/o region |
 
@@ -85,7 +96,7 @@ Region use in shell is uncommon; you preserved semantic correctness by not remap
 
 ---
 
-## 5. Case & Word Transformations
+## Case & Word Transformations
 
 | Action | Description | Default Binding(s) | Added / Alternate | Notes |
 |--------|-------------|--------------------|-------------------|-------|
@@ -96,7 +107,7 @@ Region use in shell is uncommon; you preserved semantic correctness by not remap
 
 ---
 
-## 6. Mark / Region (Optional / Advanced)
+## Mark / Region (Optional / Advanced)
 
 | Action | Description | Default Binding(s) | Added / Alternate | Notes |
 |--------|-------------|--------------------|-------------------|-------|
@@ -109,7 +120,7 @@ Region workflow is minimal in typical shell use; left untouched for correctness.
 
 ---
 
-## 7. Search / Miscellaneous
+## Search / Miscellaneous
 
 | Action | Description | Default Binding(s) | Added / Alternate | Notes |
 |--------|-------------|--------------------|-------------------|-------|
@@ -123,7 +134,7 @@ Region workflow is minimal in typical shell use; left untouched for correctness.
 
 ---
 
-## 8. Your Vim-Inspired Enhancements (Summary)
+## Your Vim-Inspired Enhancements (Summary)
 
 | Enhancement | Purpose | Binding |
 |-------------|---------|---------|
@@ -132,57 +143,21 @@ Region workflow is minimal in typical shell use; left untouched for correctness.
 | M-j | Vim-style down / history next | down-line-or-history |
 | M-k | Vim-style up / history previous | up-line-or-history |
 | C-x C-e | Edit command line externally | edit-command-line |
-| M-y | Yank duplicate (overriding yank-pop) | yank |
-| (Optional future) Restore yank-pop | Cycle kill ring | Remove M-y remap so default works |
 
 ---
 
-## 9. Potential Future Additions (No Plugins Required)
-
-| Goal | Suggested Binding | Widget | Notes |
-|------|-------------------|--------|-------|
-| Set mark | C-x C-m or C-space | set-mark-command | Terminal must send proper code |
-| Select next word (region) | M-w (rebind) | custom function | Would override kill-ring-save |
-| Restore yank-pop | M-y | yank-pop | Remove your M-y remap first |
-| Half-line up/down (history block scrolling) | M-k / M-j combos | custom | Could simulate vi ^U/^D via widgets |
-| Repeat last change (vi-style) | — | custom macro | Not native in Emacs mode |
-
----
-
-## 10. Conflict & Override Notes
+## Conflict & Override Notes
 
 | Key | Original Emacs Meaning | Current Behavior | Impact |
 |-----|------------------------|------------------|--------|
-| M-y | yank-pop (cycle kills) | yank (simple paste) | Lose cycling ability |
 | C-w (no region) | kill-region | backward-kill-word | Shell ergonomics preserved |
 | C-u | universal-argument | backward-kill-line | Standard shell convention |
 | M-h/M-l/M-j/M-k | (Unassigned / case actions / word move) | Movement shortcuts | Speeds navigation on HHKB |
 | C-x C-e | (Unbound) | edit-command-line | Opens external editor |
 
-To restore canonical Emacs kill ring cycling, remove the M-y remap in `.zshrc`.
-
 ---
 
-## 11. Recommended Minimal Cheat Sheet (Daily Use)
-
-Movement: C-a / C-e / M-b / M-f / C-p / C-n / M-h / M-l / M-j / M-k  
-Edit: C-w / M-d / C-k / C-u / C-y / M-y / M-t / C-t  
-Search: C-r / C-s / C-g  
-History: C-p / C-n / M-p / M-n  
-External edit: C-x C-e  
-Clear: C-l  
-Execute: Enter (C-m)
-
----
-
-## 12. Restoring or Adjusting Behaviors
-
-If you decide later you want `yank-pop` back:
-```zsh
-# Remove the M-y override line from .zshrc
-# Then optionally add:
-bindkey '^[y' yank-pop
-```
+## Restoring or Adjusting Behaviors
 
 If you want backward kill on M-w (sacrificing region copy):
 ```zsh
@@ -191,7 +166,7 @@ bindkey '^[w' backward-kill-word
 
 ---
 
-## 13. Reference: Non-Plugin Enhancements You Already Use
+## Reference: Non-Plugin Enhancements You Already Use
 
 - `compinit` with matcher-list fuzzy settings
 - Extended globbing and history dedup
