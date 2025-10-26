@@ -1,0 +1,180 @@
+# Xcode Dark (Helix)
+# Ported from your Zed Xcode Dark theme
+# Author: Andrew Carter (@ascarter)
+#
+# Notes:
+# - Only the dark appearance is implemented here.
+# - Some Zed categories (predictive, emphasis, etc.) were mapped to closest Helix scopes.
+# - Bold keywords + hint emphasis preserved.
+# - Palette moved to bottom per Helix docs so theme keys are not captured inside palette table.
+
+# -------------------
+# UI
+# -------------------
+"ui.background"                = { bg = "bg" }
+"ui.window"                    = { fg = "border_subtle", bg = "bg" }
+"ui.menu"                      = { fg = "fg", bg = "bg_alt" }
+"ui.menu.selected"             = { fg = "bg_alt", bg = "accent_blue", modifiers = ["bold"] }
+"ui.popup"                     = { bg = "bg_alt" }
+"ui.help"                      = { fg = "fg", bg = "bg_panel" }
+
+"ui.statusline"                = { fg = "fg", bg = "bg_panel", modifiers = ["bold"] }
+"ui.statusline.inactive"       = { fg = "fg_muted", bg = "bg_panel", modifiers = ["dim"] }
+"ui.statusline.separator"      = { fg = "fg_placeholder" }
+
+"ui.linenr"                    = { fg = "fg_placeholder", modifiers = ["dim"] }
+"ui.linenr.selected"           = { fg = "fg" }
+
+"ui.selection"                 = { fg = "fg_muted", bg = "selection_bg" }
+"ui.selection.primary"         = { fg = "fg", bg = "selection_bg", modifiers = ["bold"] }
+
+"ui.cursor"                    = { fg = "accent_blue", bg = "secondary_cursor_bg" }
+"ui.cursor.primary"            = { fg = "accent_blue", bg = "bg", modifiers = ["reversed","bold"] }
+"ui.cursor.match"              = { fg = "bg_panel", bg = "gold_match" }
+
+"ui.cursorline.primary"        = { bg = "cursorline" }
+"ui.highlight"                 = { bg = "line_highlight" }
+"ui.virtual.indent-guide"      = { fg = "fg_placeholder" }
+"ui.virtual.ruler"             = { bg = "cursorline" }
+"ui.virtual"                   = { fg = "fg_muted" }
+"ui.virtual.inlay-hint"        = { fg = "fg_muted", bg = "bg_alt" }
+
+"ui.text"                      = { fg = "fg" }
+"ui.text.inactive"             = { fg = "fg_muted" }
+"ui.text.focus"                = { fg = "fg", modifiers = ["bold"] }
+
+"ui.gutter"                    = { bg = "bg" }
+"ui.gutter.selected"           = { bg = "bg", modifiers = ["bold"] }
+
+"ui.debug.breakpoint"          = { fg = "accent_orange", modifiers = ["bold"] }
+"ui.debug.active"              = { fg = "accent_blue", modifiers = ["bold"] }
+
+# -------------------
+# Diagnostics
+# -------------------
+warning  = "accent_yellow"
+error    = "error_red"
+info     = "accent_blue"
+hint     = "accent_blue"
+
+"diagnostic"            = { underline = { color = "accent_blue", style = "curl" } }
+"diagnostic.error"      = { underline = { color = "error_red", style = "curl" } }
+"diagnostic.warning"    = { underline = { color = "accent_yellow", style = "curl" } }
+"diagnostic.info"       = { underline = { color = "accent_blue", style = "curl" } }
+"diagnostic.hint"       = { underline = { color = "accent_blue", style = "curl" } }
+
+"diagnostic.unnecessary"= { modifiers = ["dim"] }
+"diagnostic.deprecated" = { modifiers = ["crossed_out"] }
+
+# -------------------
+# Diff
+# -------------------
+"diff.plus"         = "accent_green"
+"diff.minus"        = "error_red"
+"diff.delta"        = "accent_yellow"
+"diff.plus.gutter"  = "accent_green"
+"diff.minus.gutter" = "error_red"
+"diff.delta.gutter" = "accent_yellow"
+
+# -------------------
+# Syntax Mapping
+# -------------------
+comment                       = { fg = "comment_gray", modifiers = ["italic"] }
+"comment.doc"                 = { fg = "comment_gray", modifiers = ["italic"] }
+"comment.doc.keyword"         = { fg = "doc_keyword", modifiers = ["bold"] }
+
+# Keywords & control
+keyword                       = { fg = "accent_pink", modifiers = ["bold"] }
+"keyword.directive"           = { fg = "accent_orange", modifiers = ["bold"] }
+
+# Types, enums, namespaces
+type                          = "aqua"
+"type.builtin"                = "aqua"
+namespace                     = "aqua"
+constructor                   = "turquoise"
+
+# Attributes / annotations
+attribute                     = "attribute_tan"
+
+# Functions & methods
+function                      = "teal"
+"function.builtin"            = "teal"
+"function.macro"              = "accent_orange"
+
+# Variables
+variable                      = "teal"
+"variable.other.member"       = "teal"
+"variable.parameter"          = { fg = "teal" }
+"variable.builtin"            = "aqua"
+
+# Constants
+constant                      = "teal"
+"constant.numeric"            = "gold"
+"constant.character.escape"   = "comment_gray"
+"constant.builtin"            = "gold"
+
+# Strings
+string                        = "string_red"
+
+# Labels / tags
+label                         = "turquoise"
+tag                           = "turquoise"
+
+# Operators / punctuation
+operator                      = "fg"
+punctuation                   = "fg"
+"punctuation.delimiter"       = "fg"
+
+# Emphasis-like (mapped)
+"markup.bold"                 = { modifiers = ["bold"] }
+"markup.italic"               = { modifiers = ["italic"] }
+"markup.heading"              = { fg = "accent_blue", modifiers = ["bold"] }
+"markup.link.text"            = "accent_blue"
+"markup.link.url"             = { fg = "accent_blue", modifiers = ["underlined"] }
+"markup.raw"                  = "string_red"
+"markup.quote"                = { fg = "comment_gray", modifiers = ["italic"] }
+
+# Hints / predictive (mapped)
+"hint.scope"                  = { fg = "accent_blue", modifiers = ["bold"] }
+
+# -------------------
+# Optional future mappings (commented for expansion)
+# "string.regex"             = "string_red"
+# "variable.special"         = "gold"
+# "punctuation.special"      = "fg"
+# "text.literal"             = "string_red"
+# "title"                    = { fg = "turquoise", modifiers = ["bold"] }
+
+# -------------------
+# Palette (from Zed Xcode Dark) - must be last so keys above are not captured
+# -------------------
+[palette]
+bg            = "#1e1e1e"
+bg_alt        = "#282828"
+bg_panel      = "#323232"
+fg            = "#ffffffd8"
+fg_muted      = "#ffffff8c"
+fg_placeholder= "#ffffff3f"
+line_highlight= "#ffffff0c"
+cursorline = "#262626"
+bracket_bg    = "#464646"
+accent_blue   = "#0a84ff"
+accent_orange = "#ff9f0a"
+accent_green  = "#32d74b"
+accent_magenta= "#bf5af2"
+accent_cyan   = "#5ac8f5"
+accent_yellow = "#ffd60a"
+accent_pink   = "#fc5fa3"
+gold          = "#d0bf69"
+teal          = "#67b7a4"
+turquoise     = "#5cd6df"
+aqua          = "#9dd5ff"
+string_red    = "#fc6a5d"
+comment_gray  = "#6c7986"
+attribute_tan = "#bf956a"
+error_red     = "#ff453a"
+secondary_cursor_bg = "#275d90"
+border_subtle = "#242424"
+selection_bg  = "#2a2f34"
+gold_match     = "#b39d4d"
+doc_keyword    = "#92A1B1"

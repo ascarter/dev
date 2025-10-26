@@ -1,10 +1,12 @@
-theme = "ansi"
+theme = "xcode"
 
 [editor]
 line-number = "relative"
 color-modes = true
 bufferline = "multiple"
+cursorline = true
 popup-border = "all"
+# rulers = [80, 120]
 
 [editor.cursor-shape]
 insert = "bar"
