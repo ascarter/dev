@@ -1,4 +1,5 @@
 font-family = "Berkeley Mono"
+# theme = light:tokul-light,dark:tokul-dark
 background-opacity = 0.98
 background-blur-radius = 20
 window-padding-x = 12
@@ -13,8 +14,6 @@ keybind = global:alt+super+grave_accent=toggle_quick_terminal
 keybind = shift+enter=text:\n
 
 # Vim style navigation
-keybind = super+u=scroll_page_up
-keybind = super+d=scroll_page_down
 keybind = super+alt+j=goto_split:down
 keybind = super+alt+k=goto_split:up
 keybind = super+alt+h=goto_split:left
