@@ -1,4 +1,4 @@
-theme = "xcode"
+theme = "ansi"
 
 [editor]
 line-number = "relative"

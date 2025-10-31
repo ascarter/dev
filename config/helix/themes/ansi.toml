@@ -1,105 +1,237 @@
-# ANSI Terminal theme
-# Author: Andrew Carter <@ascarter>
+["ui.cursor"]
+fg = "blue"
+bg = "default"
+modifiers = ["reversed"]
 
-# Uses only ANSI terminal 16 color values for portability
-# Optimized for color sensitive users
-# Adapts to dark or light terminal if terminal theme adapts
-# Recommend using Apple terminal theme that uses dynamic colors
-# for text, background and accents
+["ui.cursor.primary"]
+fg = "blue"
+bg = "default"
+modifiers = ["reversed"]
 
-# -------------------
-# UI
-# -------------------
+["ui.cursor.secondary"]
+fg = "blue"
+bg = "default"
+modifiers = ["reversed"]
 
-"ui.cursor" = { fg = "white", bg = "blue" }
-"ui.cursor.primary" = { fg = "white", bg = "blue" }
-"ui.cursor.secondary" = { fg = "white", bg = "blue" }
-"ui.cursor.match" = { fg = "default", bg = "light-blue", modifiers = ["bold"] }
+["ui.cursor.match"]
+fg = "light-blue"
+bg = "default"
+modifiers = ["reversed", "bold"]
 
-"ui.cursorline.primary" = { underline = { color = "light-gray", style = "dotted" } }
-"ui.cursorcolumn.primary" = { fg = "white", bg = "light-blue" }
+["ui.cursorline.primary"]
+["ui.cursorline.primary.underline"]
+color = "light-gray"
+style = "dotted"
 
-"ui.gutter" = { bg = "default" }
-"ui.gutter.selected" = { bg = "default", modifiers = ["bold"] }
+["ui.cursorcolumn.primary"]
+fg = "white"
+bg = "light-blue"
 
-"ui.linenr" = { modifiers = ["dim"] }
-"ui.linenr.selected" = { modifiers = ["bold"] }
+["ui.gutter"]
+bg = "default"
 
-"ui.debug.breakpoint" = { fg = "red", modifiers = ["bold"] }
-"ui.debug.active" = { fg = "yellow", modifiers = ["bold"] }
+["ui.gutter.selected"]
+bg = "default"
+modifiers = ["bold"]
 
-"ui.statusline" = { bg = "default", modifiers = ["bold"] }
-"ui.statusline.separator" = { modifiers = ["dim"] }
-"ui.statusline.inactive" = { bg = "default", modifiers = ["dim"] }
-"ui.statusline.normal" = { modifiers = ["bold"] }
-"ui.statusline.insert" = { fg = "0", bg = "light-yellow", modifiers = ["bold"] }
-"ui.statusline.select" = { fg = "white", bg = "blue", modifiers = ["bold"] }
+["ui.linenr"]
+modifiers = ["dim"]
 
-"ui.selection" = { fg = "default", bg = "light-blue" }
-# "ui.selection.primary" = { modifiers = ["reversed"] }
+["ui.linenr.selected"]
+modifiers = ["bold"]
 
-# "ui.menu" = { fg = "default", bg = "light-blue" }
-"ui.menu.selected" = { fg = "default", bg = "light-blue", modifiers = ["bold"] }
-"ui.menu.scroll" = { fg = "blue", bg = "light-gray" }
+["ui.debug.breakpoint"]
+fg = "red"
+modifiers = ["bold"]
 
-# "ui.popup" = { bg = "gray" }
-"ui.highlight" = { fg = "yellow", bg = "light-blue", modifiers = ["italic"] }
-"ui.text.focus" = { modifiers = ["bold"] }
-"ui.text.inactive" = { modifiers = ["dim"] }
+["ui.debug.active"]
+fg = "yellow"
+modifiers = ["bold"]
 
-"ui.help" = { fg = "default", bg = "default" }
-"ui.window" = { fg = "light-gray", bg = "default", modifiers = ["dim"] }
+["ui.statusline"]
+bg = "default"
+modifiers = ["bold"]
 
-"ui.virtual" = { fg = "light-gray", modifiers = ["dim"] }
-"ui.virtual.ruler" = { bg = "gray" }
-"ui.virtual.whitespace" = { fg = "gray", bg = "default", modifiers = ["dim"] }
-"ui.virtual.indent-guide" = { fg = "light-gray", modifiers = ["dim"] }
-"ui.virtual.inlay-hint" = { bg = "light-gray" }
+["ui.statusline.separator"]
+modifiers = ["dim"]
 
-warning = "yellow"
-error = "red"
-info = "default"
-hint = "cyan"
+["ui.statusline.inactive"]
+bg = "default"
+modifiers = ["dim"]
 
-"diagnostic" = { underline = { color = "red", style = "curl" } }
-"diagnostic.hint" = { underline = { color = "white", style = "curl" } }
-"diagnostic.info" = { underline = { color = "light-cyan", style = "curl" } }
-"diagnostic.warning" = { underline = { color = "light-yellow", style = "curl" } }
-"diagnostic.error" = { underline = { color = "light-red", style = "curl" } }
+["ui.statusline.normal"]
+modifiers = ["bold"]
 
-# -------------------
-# Syntax Highlighting
-# -------------------
+["ui.statusline.insert"]
+fg = "0"
+bg = "light-yellow"
+modifiers = ["bold"]
 
-# Match tree-sitter scopes
-comment = { fg = "light-gray", modifiers = ["italic"] }
-constant = { fg = "yellow", modifiers = ["bold"] }
-"constant.numeric" = { fg = "magenta", modifiers = ["bold"] }
-string = { fg = "blue" }
-variable = { modifiers = ["italic"] }
-function = { modifiers = ["bold"] }
-tag = "blue"
-namespace = { modifiers = ["bold"] }
+["ui.statusline.select"]
+fg = "white"
+bg = "blue"
+modifiers = ["bold"]
 
-# markup
-"markup.heading" = { modifiers = ["bold"] }
-"markup.list" = { modifiers = ["bold"] }
-"markup.bold" = { modifiers = ["bold"] }
-"markup.italic" = { modifiers = ["italic"] }
-"markup.strikethrough" = { modifiers = ["dim", "crossed_out"] }
+["ui.selection"]
+fg = "light-blue"
+bg = "default"
+modifiers = ["reversed"]
+
+["ui.menu.selected"]
+fg = "light-blue"
+bg = "default"
+modifiers = ["reversed", "bold"]
+
+["ui.menu.scroll"]
+fg = "blue"
+bg = "light-gray"
+
+["ui.highlight"]
+fg = "yellow"
+bg = "light-blue"
+modifiers = ["italic"]
+
+["ui.text.focus"]
+modifiers = ["bold"]
+
+["ui.text.inactive"]
+modifiers = ["dim"]
+
+["ui.help"]
+fg = "default"
+bg = "default"
+
+["ui.window"]
+fg = "light-gray"
+bg = "default"
+modifiers = ["dim"]
+
+["ui.virtual"]
+fg = "light-gray"
+modifiers = ["dim"]
+
+["ui.virtual.ruler"]
+bg = "gray"
+
+["ui.virtual.whitespace"]
+fg = "gray"
+bg = "default"
+modifiers = ["dim"]
+
+["ui.virtual.indent-guide"]
+fg = "light-gray"
+modifiers = ["dim"]
+
+["ui.virtual.inlay-hint"]
+bg = "light-gray"
+
+"warning" = "yellow"
+"error" = "red"
+"info" = "default"
+"hint" = "cyan"
+["diagnostic"]
+["diagnostic.underline"]
+color = "red"
+style = "curl"
+
+["diagnostic.hint"]
+["diagnostic.hint.underline"]
+color = "gray"
+style = "curl"
+
+["diagnostic.info"]
+["diagnostic.info.underline"]
+color = "cyan"
+style = "curl"
+
+["diagnostic.warning"]
+["diagnostic.warning.underline"]
+color = "yellow"
+style = "curl"
+
+["diagnostic.error"]
+["diagnostic.error.underline"]
+color = "red"
+style = "curl"
+
+["comment"]
+fg = "gray"
+modifiers = ["italic"]
+
+["constant"]
+fg = "yellow"
+modifiers = ["bold"]
+
+["constant.numeric"]
+fg = "yellow"
+modifiers = ["bold"]
+
+["string"]
+fg = "green"
+
+["variable"]
+modifiers = ["italic"]
+
+["function"]
+modifiers = ["bold"]
+
+"tag" = "blue"
+["namespace"]
+modifiers = ["bold"]
+
+["markup.heading"]
+modifiers = ["bold"]
+
+["markup.list"]
+modifiers = ["bold"]
+
+["markup.bold"]
+modifiers = ["bold"]
+
+["markup.italic"]
+modifiers = ["italic"]
+
+["markup.strikethrough"]
+modifiers = ["dim", "crossed_out"]
+
 "markup.link" = "blue"
-"markup.quote" = { modifiers = ["italic"] }
-"markup.raw.block" = { modifiers = ["italic"] }
-"markup.raw.inline" = { modifiers = ["bold"] }
+["markup.quote"]
+modifiers = ["italic"]
 
-# diff
+["markup.raw.block"]
+modifiers = ["italic"]
+
+["markup.raw.inline"]
+modifiers = ["bold"]
+
 "diff" = "default"
-"diff.plus" = { modifiers = ["bold"] }
-"diff.minus" = { fg = "red", modifiers = ["bold"] }
-"diff.delta" = { modifiers = ["bold", "italic"] }
+["diff.plus"]
+modifiers = ["bold"]
+fg = "green"
+
+["diff.minus"]
+fg = "red"
+modifiers = ["bold"]
+
+["diff.delta"]
+modifiers = ["bold", "italic"]
+fg = "yellow"
+
 "diff.plus.gutter" = "green"
 "diff.minus.gutter" = "red"
-"diff.delta.gutter" = "cyan"
+"diff.delta.gutter" = "yellow"
+["keyword"]
+fg = "blue"
+modifiers = ["bold"]
+
+["statement"]
+fg = "blue"
+
+["type"]
+fg = "cyan"
+
+["structure"]
+fg = "cyan"
 
 # -------------------
 # Color Palette
