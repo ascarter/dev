@@ -8,42 +8,16 @@
 # for text, background and accents
 
 # -------------------
-# Color Palette
-# -------------------
-
-# ANSI Color Names
-#
-# Idx  Name
-# ---  -----------
-#  -   default
-#  0   black
-#  1   red
-#  2   green
-#  3   yellow
-#  4   blue
-#  5   magenta
-#  6   cyan
-#  7   light-gray
-#  8   gray
-#  9   light-red
-# 10   light-green
-# 11   light-yellow
-# 12   light-blue
-# 13   light-magenta
-# 14   light-cyan
-# 15   white
-
-# -------------------
 # UI
 # -------------------
 
 "ui.cursor" = { fg = "white", bg = "blue" }
 "ui.cursor.primary" = { fg = "white", bg = "blue" }
 "ui.cursor.secondary" = { fg = "white", bg = "blue" }
-"ui.cursor.match" = { fg = "black", bg = "yellow", modifiers = ["bold"] }
+"ui.cursor.match" = { fg = "default", bg = "light-blue", modifiers = ["bold"] }
 
-"ui.cursorline.primary" = { underline = { color = "blue", style = "dotted" } }
-"ui.cursorcolumn.primary" = { fg = "white", bg = "blue" }
+"ui.cursorline.primary" = { underline = { color = "light-gray", style = "dotted" } }
+"ui.cursorcolumn.primary" = { fg = "white", bg = "light-blue" }
 
 "ui.gutter" = { bg = "default" }
 "ui.gutter.selected" = { bg = "default", modifiers = ["bold"] }
@@ -61,15 +35,15 @@
 "ui.statusline.insert" = { fg = "0", bg = "light-yellow", modifiers = ["bold"] }
 "ui.statusline.select" = { fg = "white", bg = "blue", modifiers = ["bold"] }
 
-"ui.selection" = { fg = "white", bg = "blue" }
+"ui.selection" = { fg = "default", bg = "light-blue" }
 # "ui.selection.primary" = { modifiers = ["reversed"] }
 
 # "ui.menu" = { fg = "default", bg = "light-blue" }
-"ui.menu.selected" = { fg = "white", bg = "light-blue", modifiers = ["bold"] }
+"ui.menu.selected" = { fg = "default", bg = "light-blue", modifiers = ["bold"] }
 "ui.menu.scroll" = { fg = "blue", bg = "light-gray" }
 
 # "ui.popup" = { bg = "gray" }
-"ui.highlight" = { fg = "light-blue", bg = "white", modifiers = ["reversed"] }
+"ui.highlight" = { fg = "yellow", bg = "light-blue", modifiers = ["italic"] }
 "ui.text.focus" = { modifiers = ["bold"] }
 "ui.text.inactive" = { modifiers = ["dim"] }
 
@@ -100,8 +74,8 @@ hint = "cyan"
 # Match tree-sitter scopes
 comment = { fg = "light-gray", modifiers = ["italic"] }
 constant = { fg = "yellow", modifiers = ["bold"] }
-"constant.numeric" = { fg = "blue", modifiers = ["bold"] }
-string = { fg = "green" }
+"constant.numeric" = { fg = "magenta", modifiers = ["bold"] }
+string = { fg = "blue" }
 variable = { modifiers = ["italic"] }
 function = { modifiers = ["bold"] }
 tag = "blue"
@@ -126,3 +100,29 @@ namespace = { modifiers = ["bold"] }
 "diff.plus.gutter" = "green"
 "diff.minus.gutter" = "red"
 "diff.delta.gutter" = "cyan"
+
+# -------------------
+# Color Palette
+# -------------------
+
+# ANSI Color Names
+#
+# Idx  Name
+# ---  -----------
+#  -   default
+#  0   black
+#  1   red
+#  2   green
+#  3   yellow
+#  4   blue
+#  5   magenta
+#  6   cyan
+#  7   light-gray
+#  8   gray
+#  9   light-red
+# 10   light-green
+# 11   light-yellow
+# 12   light-blue
+# 13   light-magenta
+# 14   light-cyan
+# 15   white
