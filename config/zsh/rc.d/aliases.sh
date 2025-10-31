@@ -32,6 +32,12 @@ ghostty_term() {
   infocmp -x | ssh $@ -SERVER -- tic -x -
 }
 
+# Developer tools
+
+if command -v rustup >/dev/null 2>&1; then
+  alias rustbook="rustup doc --book"
+fi
+
 # Platform specific aliases
 case $(uname) in
 Darwin)
@@ -41,6 +47,9 @@ Darwin)
 
   # Rebuild Spotlight index
   alias spotlight-rebuild="sudo mdutil -E /"
+
+  # De-quarantine
+  alias dequarantine="xattr -d com.apple.quarantine"
 
   # QuickLook
   alias ql='qlmanage -p "$@" >& /dev/null'
