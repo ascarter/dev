@@ -11,13 +11,13 @@
 # UI
 # -------------------
 
-"ui.cursor" = { fg = "white", bg = "blue" }
-"ui.cursor.primary" = { fg = "white", bg = "blue" }
-"ui.cursor.secondary" = { fg = "white", bg = "blue" }
-"ui.cursor.match" = { fg = "default", bg = "light-blue", modifiers = ["bold"] }
+"ui.cursor" = { fg = "blue", bg = "default", modifiers = ["reversed"] }
+"ui.cursor.primary" = { fg = "blue", bg = "default", modifiers = ["reversed"] }
+"ui.cursor.secondary" = { fg = "blue", bg = "default", modifiers = ["reversed"] }
+"ui.cursor.match" = { fg = "light-blue", bg = "default", modifiers = ["reversed", "bold"] }
 
 "ui.cursorline.primary" = { underline = { color = "light-gray", style = "dotted" } }
-"ui.cursorcolumn.primary" = { fg = "white", bg = "light-blue" }
+"ui.cursorcolumn.primary" = { fg = "light-gray", bg = "default", modifiers = ["reversed"] }
 
 "ui.gutter" = { bg = "default" }
 "ui.gutter.selected" = { bg = "default", modifiers = ["bold"] }
@@ -32,14 +32,14 @@
 "ui.statusline.separator" = { modifiers = ["dim"] }
 "ui.statusline.inactive" = { bg = "default", modifiers = ["dim"] }
 "ui.statusline.normal" = { modifiers = ["bold"] }
-"ui.statusline.insert" = { fg = "0", bg = "light-yellow", modifiers = ["bold"] }
+"ui.statusline.insert" = { fg = "black", bg = "light-yellow", modifiers = ["bold"] }
 "ui.statusline.select" = { fg = "white", bg = "blue", modifiers = ["bold"] }
 
-"ui.selection" = { fg = "default", bg = "light-blue" }
+"ui.selection" = { fg = "light-blue", bg = "default", modifiers = ["reversed"] }
 # "ui.selection.primary" = { modifiers = ["reversed"] }
 
 # "ui.menu" = { fg = "default", bg = "light-blue" }
-"ui.menu.selected" = { fg = "default", bg = "light-blue", modifiers = ["bold"] }
+"ui.menu.selected" = { fg = "light-blue", bg = "default", modifiers = ["reversed", "bold"] }
 "ui.menu.scroll" = { fg = "blue", bg = "light-gray" }
 
 # "ui.popup" = { bg = "gray" }
@@ -62,10 +62,10 @@ info = "default"
 hint = "cyan"
 
 "diagnostic" = { underline = { color = "red", style = "curl" } }
-"diagnostic.hint" = { underline = { color = "white", style = "curl" } }
-"diagnostic.info" = { underline = { color = "light-cyan", style = "curl" } }
-"diagnostic.warning" = { underline = { color = "light-yellow", style = "curl" } }
-"diagnostic.error" = { underline = { color = "light-red", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "gray", style = "curl" } }
+"diagnostic.info" = { underline = { color = "cyan", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "yellow", style = "curl" } }
+"diagnostic.error" = { underline = { color = "red", style = "curl" } }
 
 # -------------------
 # Syntax Highlighting
@@ -74,10 +74,14 @@ hint = "cyan"
 # Match tree-sitter scopes
 comment = { fg = "light-gray", modifiers = ["italic"] }
 constant = { fg = "yellow", modifiers = ["bold"] }
-"constant.numeric" = { fg = "magenta", modifiers = ["bold"] }
-string = { fg = "blue" }
+"constant.numeric" = { fg = "yellow", modifiers = ["bold"] }
+string = { fg = "green" }
 variable = { modifiers = ["italic"] }
 function = { modifiers = ["bold"] }
+type = { fg = "cyan" }
+structure = { fg = "cyan" }
+statement = { fg = "blue" }
+keyword = { fg = "blue", modifiers = ["bold"] }
 tag = "blue"
 namespace = { modifiers = ["bold"] }
 
@@ -99,7 +103,7 @@ namespace = { modifiers = ["bold"] }
 "diff.delta" = { modifiers = ["bold", "italic"] }
 "diff.plus.gutter" = "green"
 "diff.minus.gutter" = "red"
-"diff.delta.gutter" = "cyan"
+"diff.delta.gutter" = "yellow"
 
 # -------------------
 # Color Palette

@@ -53,14 +53,14 @@ hi PmenuSbar  ctermfg=4    ctermbg=8
 hi PmenuThumb ctermfg=NONE ctermbg=7
 
 " Visual selection
-hi Visual ctermfg=12 ctermbg=15 cterm=reverse
+hi Visual ctermfg=12 ctermbg=NONE cterm=reverse
 
 " Incremental search / highlight
-hi IncSearch ctermfg=12 ctermbg=15 cterm=reverse
-hi Search    ctermfg=0  ctermbg=11
+hi Search ctermfg=11 ctermbg=NONE cterm=reverse
+hi IncSearch ctermfg=11 ctermbg=NONE cterm=reverse
 
 " Bracket match (cursor.match)
-hi MatchParen ctermfg=0 ctermbg=3 cterm=bold
+hi MatchParen ctermfg=12 ctermbg=NONE cterm=bold,reverse
 
 " Gutter/sign column
 hi SignColumn ctermfg=7 ctermbg=NONE
@@ -80,24 +80,24 @@ hi Boolean      ctermfg=NONE
 hi Comment      ctermfg=7    cterm=italic
 hi Conditional  ctermfg=NONE
 hi Constant     ctermfg=3    cterm=bold
-hi Number       ctermfg=4    cterm=bold
+hi Number       ctermfg=3    cterm=bold
 hi Exception    ctermfg=NONE
 hi Function     ctermfg=NONE cterm=bold
 hi Identifier   ctermfg=NONE cterm=italic
 hi Include      ctermfg=NONE
-hi Keyword      ctermfg=NONE
+hi Keyword      ctermfg=4    cterm=bold
 hi Label        ctermfg=NONE
 hi Macro        ctermfg=NONE cterm=italic
 hi Operator     ctermfg=NONE
 hi PreProc      ctermfg=NONE cterm=italic
 hi Repeat       ctermfg=NONE
 hi Special      ctermfg=NONE
-hi Statement    ctermfg=NONE
+hi Statement    ctermfg=4
 hi StorageClass ctermfg=NONE
-hi String       ctermfg=4
-hi Structure    ctermfg=NONE cterm=bold
+hi String       ctermfg=2
+hi Structure    ctermfg=6    cterm=bold
 hi Tag          ctermfg=4
-hi Type         ctermfg=NONE
+hi Type         ctermfg=6
 hi Whitespace   ctermfg=8
 
 hi Error ctermfg=1 ctermbg=NONE
