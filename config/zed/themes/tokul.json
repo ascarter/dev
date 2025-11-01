@@ -1,0 +1,197 @@
+{
+  "$schema": "https://zed.dev/schema/themes/v0.2.0.json",
+  "name": "Tokul",
+  "author": "Andrew Carter <ascarter@icloud.com>",
+  "themes": [
+    {
+      "name": "Tokul Dark",
+      "appearance": "dark",
+      "style": {
+        "editor.active_line.background": "#23252BFF",
+        "editor.active_line_number": "#FFFFFFD9",
+        "editor.background": "#1F1F24FF",
+        "editor.debugger.active_line_background": "#808080FF",
+        "editor.gutter.background": "#1F1F24FF",
+        "editor.invisible": "#424D5BFF",
+        "editor.line_number": "#424D5BFF",
+        "terminal.background": "#1F1F24FF",
+        "text": "#FFFFFFD9",
+        "text.disabled": "#424D5BFF",
+        "text.placeholder": "#424D5BFF",
+        "conflict": "#F74A4AFF",
+        "created": "A482FFFF",
+        "deleted": "F74A4AFF",
+        "error": "#F74A4AFF",
+        "hidden": "#424D5BFF",
+        "hint": "#424D5BFF",
+        "ignored": "#424D5BFF",
+        "info": "#675FFFFF",
+        "modified": "#A482FFFF",
+        "predictive": "#424D5BFF",
+        "renamed": "#675FFFFF",
+        "warning": "#EFB759FF",
+        "version_control.added": "#A482FFFF",
+        "version_control.modified": "#EFB759FF",
+        "version_control.deleted": "#F74A4AFF",
+        "vim.mode.text": "#FFFFFFD9",
+        "vim.normal.background": "#303239FF",
+        "vim.insert.background": "#EFB759A9",
+        "vim.visual.background": "#515B70FF",
+        "vim.replace.background": "#EFB759A9",
+        "vim.visual_line.background": "#515B70FF",
+        "vim.visual_block.background": "#515B70FF",
+        "vim.helix_normal.background": "#303239FF",
+        "vim.helix_select.background": "#515B70FF",
+        "players": [{ "selection": "#515B70FF" }],
+        "syntax": {
+          "attribute": {
+            "color": "#BF8555FF"
+          },
+          "comment": {
+            "color": "#6C7986FF",
+            "font_style": "italic"
+          },
+          "comment.doc": {
+            "color": "#6C7986FF",
+            "font_style": "italic"
+          },
+          "constant": {
+            "color": "#67B7A4FF",
+            "font_weight": 700
+          },
+          "function": {
+            "color": "#67B7A4FF",
+            "font_weight": 700
+          },
+          "keyword": {
+            "color": "#FC5FA3FF",
+            "font_weight": 700
+          },
+          "link_uri": {
+            "color": "#5482FFFF"
+          },
+          "namespace": {
+            "color": "#FD8F3FFF"
+          },
+          "number": {
+            "color": "#D0BF69FF"
+          },
+          "predictive": {
+            "color": "#424D5BFF",
+            "font_style": "italic"
+          },
+          "preproc": {
+            "color": "#FD8F3FFF"
+          },
+          "primary": {
+            "color": "#FFFFFFD9"
+          },
+          "string": {
+            "color": "#FC6A5DFF"
+          },
+          "type": {
+            "color": "#9EF1DDFF"
+          },
+          "variable": {
+            "color": "#67B7A4FF"
+          }
+        }
+      }
+    },
+    {
+      "name": "Tokul Light",
+      "appearance": "light",
+      "style": {
+        "editor.active_line.background": "#E8F2FFFF",
+        "editor.active_line_number": "#000000D9",
+        "editor.background": "#FFFFFFFF",
+        "editor.debugger.active_line_background": "#6C6C6CFF",
+        "editor.gutter.background": "#FFFFFFFF",
+        "editor.invisible": "#CCCCCCFF",
+        "editor.line_number": "#CCCCCCFF",
+        "terminal.background": "#FFFFFFFF",
+        "text": "#000000D9",
+        "text.disabled": "#CCCCCCFF",
+        "text.placeholder": "#CCCCCCFF",
+        "conflict": "#F74A4AFF",
+        "created": "A482FFFF",
+        "deleted": "F74A4AFF",
+        "error": "#F74A4AFF",
+        "hidden": "#CCCCCCFF",
+        "hint": "#424D5BFF",
+        "ignored": "#CCCCCCFF",
+        "info": "#675FFFFF",
+        "modified": "#A482FFFF",
+        "predictive": "#CCCCCCFF",
+        "renamed": "#675FFFFF",
+        "warning": "#EFB759FF",
+        "version_control.added": "#A482FFFF",
+        "version_control.modified": "#EFB759FF",
+        "version_control.deleted": "#F74A4AFF",
+        "vim.mode.text": "#000000D9",
+        "vim.normal.background": "#F5F5F5FF",
+        "vim.insert.background": "#EFB759FF",
+        "vim.visual.background": "#E8F2FFFF",
+        "vim.replace.background": "#EFB759FF",
+        "vim.visual_line.background": "#E8F2FFFF",
+        "vim.visual_block.background": "#E8F2FFFF",
+        "vim.helix_normal.background": "#F5F5F5FF",
+        "vim.helix_select.background": "#E8F2FFFF",
+        "players": [{ "selection": "#A4CDFFFF" }],
+        "syntax": {
+          "attribute": {
+            "color": "#815F03FF"
+          },
+          "comment": {
+            "color": "#5D6C79FF",
+            "font_style": "italic"
+          },
+          "comment.doc": {
+            "color": "#5D6C79FF",
+            "font_style": "italic"
+          },
+          "constant": {
+            "color": "#326D74FF",
+            "font_weight": 700
+          },
+          "function": {
+            "color": "#326D74FF",
+            "font_weight": 700
+          },
+          "keyword": {
+            "color": "#9B2393FF",
+            "font_weight": 700
+          },
+          "link_uri": {
+            "color": "#0E0EFFFF"
+          },
+          "namespace": {
+            "color": "#643820FF"
+          },
+          "number": {
+            "color": "#1C00CFFF"
+          },
+          "predictive": {
+            "color": "#CCCCCCFF",
+            "font_style": "italic"
+          },
+          "preproc": {
+            "color": "#643820FF"
+          },
+          "primary": {
+            "color": "#000000D9"
+          },
+          "string": {
+            "color": "#C41A16FF"
+          },
+          "type": {
+            "color": "#1C464AFF"
+          },
+          "variable": {
+            "color": "#326D74FF"
+          }
+        }
+      }
+    }
+  ]
+}
