@@ -91,7 +91,7 @@ namespace = { modifiers = ["bold"] }
 "markup.bold" = { modifiers = ["bold"] }
 "markup.italic" = { modifiers = ["italic"] }
 "markup.strikethrough" = { modifiers = ["dim", "crossed_out"] }
-"markup.link" = "blue"
+"markup.link" = { fg = "blue", modifiers = ["underline"] }
 "markup.quote" = { modifiers = ["italic"] }
 "markup.raw.block" = { modifiers = ["italic"] }
 "markup.raw.inline" = { modifiers = ["bold"] }

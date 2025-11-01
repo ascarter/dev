@@ -4,7 +4,7 @@ theme = "ansi"
 line-number = "relative"
 color-modes = true
 bufferline = "multiple"
-cursorline = true
+# cursorline = true
 popup-border = "all"
 # rulers = [80, 120]
 
