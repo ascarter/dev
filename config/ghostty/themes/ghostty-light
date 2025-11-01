@@ -15,11 +15,11 @@ palette = 13=#c397d8
 palette = 14=#70c0b1
 palette = 15=#eaeaea
 
-background = #282c34
-foreground = #ffffff
+background = #ffffff
+foreground = #282c34
 
-cursor-color =
-cursor-text =
+cursor-color = #0057D9
+cursor-text = #FFFFFF
 
-selection-foreground =
-selection-background =
+selection-foreground = #111111
+selection-background = #CDE7FF
